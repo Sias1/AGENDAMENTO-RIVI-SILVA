@@ -4,115 +4,168 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agendamento | Rivi Silva Esmalteria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         gold: '#D4AF37',
-                        black: '#000000',
+                        'gold-light': '#F5E6A3',
+                        black: '#0A0A0A',
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
+    
     <style>
-        body { background-color: #000; color: #D4AF37; }
-        .form-input { 
-            background-color: #1a1a1a; 
-            border: 1px solid #333; 
-            color: white; 
+        body {
+            background-color: #FFFFFF; /* Fundo Clean/Branco */
+            color: #0A0A0A; /* Texto Escuro */
+            font-family: 'Montserrat', sans-serif;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(212, 175, 55, 0.03) 0px, transparent 50%);
         }
-        .form-input:focus { border-color: #D4AF37; outline: none; }
+        .clean-card {
+            background-color: #FDFDFD;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+        }
+        .gold-gradient-bg {
+            background: linear-gradient(135deg, #D4AF37 0%, #F5E6A3 100%);
+            color: #FFFFFF; /* Texto Branco no Botão Dourado */
+        }
+        .form-input {
+            background-color: #FFFFFF !important;
+            border: 1px solid rgba(212, 175, 55, 0.2) !important;
+            color: #0A0A0A !important;
+        }
+        .form-input:focus {
+            border-color: #D4AF37 !important;
+            box-shadow: 0 0 0 1px #D4AF37 !important;
+            outline: none;
+        }
     </style>
 </head>
-<body class="p-6 flex flex-col items-center min-h-screen">
+<body class="p-4 md:p-8 flex flex-col items-center min-h-screen">
     
-    <header class="mb-10 text-center">
-        <h1 class="text-4xl font-bold text-white mb-2">Rivi Silva</h1>
-        <p class="text-xs uppercase tracking-widest text-zinc-500">Nails & Care</p>
+    <header class="w-full max-w-7xl flex flex-col items-center mb-10 mt-4">
+        <div class="h-24 md:h-32 w-24 md:w-32 rounded-full overflow-hidden border-2 border-gold mb-3 shadow-lg">
+            <img src="image_5.png" alt="Rivi Silva Logo" class="w-full h-full object-cover">
+        </div>
+        
+        <p class="font-sans text-xs uppercase tracking-[0.5em] text-zinc-500 text-center">
+            ESMALTERIA PREMIVM
+        </p>
     </header>
 
-    <main class="w-full max-w-md bg-zinc-900 p-8 rounded-2xl border border-zinc-800 shadow-xl">
-        <h2 class="text-2xl font-semibold mb-6 text-white text-center">Agendamento Online</h2>
-
-        <div class="space-y-4">
-            <div>
-                <label class="block mb-1 text-sm text-zinc-400">Nome da Cliente</label>
-                <input id="nome" type="text" class="form-input w-full p-3 rounded-lg">
-            }
-            
-            <div>
-                <label class="block mb-1 text-sm text-zinc-400">Telefone</label>
-                <input id="telefone" type="tel" placeholder="(00) 90000-0000" class="form-input w-full p-3 rounded-lg">
-            }
-
-            <div>
-                <label class="block mb-1 text-sm text-zinc-400">Serviço</label>
-                <select id="servico" class="form-input w-full p-3 rounded-lg cursor-pointer">
-                    <option value="" disabled selected>Selecione...</option>
-                    <option>Alongamento em Gel</option>
-                    <option>Banho de Gel</option>
-                    <option>Manicure Simples</option>
-                </select>
-            }
-
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block mb-1 text-sm text-zinc-400">Data</label>
-                    <input id="data" type="date" class="form-input w-full p-3 rounded-lg cursor-pointer">
-                }
-                <div>
-                    <label class="block mb-1 text-sm text-zinc-400">Horário</label>
-                    <input id="horario" type="time" class="form-input w-full p-3 rounded-lg cursor-pointer">
-                }
+    <main class="w-full max-w-7xl grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+        
+        <div class="flex flex-col gap-6 md:pr-10">
+            <h2 class="text-4xl font-light text-zinc-900 leading-tight">
+                Seu momento de brilhar começa aqui, <span class="font-semibold text-gold">gata. 💅</span>
+            </h2>
+            <p class="text-zinc-600 text-lg">
+                Agende o seu horário de forma rápida e segura na Rivi Silva Esmalteria. Escolha o melhor dia, o serviço de luxo que você merece e deixe o resto conosco.
+            </p>
+            <div class="clean-card p-6 rounded-2xl border-l-4 border-l-gold">
+                <p class="text-sm text-zinc-500">Próximos passos:</p>
+                <p class="text-xl font-medium text-black">Preencha o formulário e receba sua confirmação instantânea.</p>
             </div>
-
-            <button onclick="finalizarAgendamento()" class="w-full bg-gold text-black font-bold py-4 mt-6 rounded-lg hover:bg-yellow-600 transition duration-300">
-                CONFIRMAR AGENDAMENTO ✨
-            </button>
         </div>
+
+        <div class="w-full clean-card p-8 md:p-10 rounded-3xl">
+            <h3 class="text-2xl font-semibold mb-8 border-b border-zinc-200 pb-4 text-gold">
+                Solicitar Agendamento
+            </h3>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-zinc-700 mb-2">Seu Nome Completo</label>
+                    <input id="nome" type="text" placeholder="Ex: Maria Eduarda..." class="form-input w-full p-4 rounded-xl text-lg">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-zinc-700 mb-2">Serviço Desejado</label>
+                    <select id="servico" class="form-input w-full p-4 rounded-xl text-lg cursor-pointer">
+                        <option value="" disabled selected>Selecione...</option>
+                        <option value="Alongamento Gel">Alongamento em Gel (Premium)</option>
+                        <option value="Banho Gel">Banho de Gel (Brilho Intenso)</option>
+                        <option value="Manicure Simples">Manicure Simples (Clássica)</option>
+                        <option value="Pedicure Simples">Pedicure Simples</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-zinc-700 mb-2">Data e Hora</label>
+                    <input id="data" type="datetime-local" class="form-input w-full p-4 rounded-xl text-lg cursor-pointer">
+                </div>
+
+                <button onclick="agendar()" class="w-full gold-gradient-bg font-bold py-5 rounded-xl text-lg uppercase tracking-widest hover:brightness-110 transition duration-300 transform hover:scale-[1.01] active:scale-[0.99] shadow-md shadow-gold/20">
+                    CONFIRMAR AGENDAMENTO ✨
+                </button>
+            </div>
+        </div>
+
     </main>
 
+    <footer class="w-full max-w-7xl mt-20 pt-8 border-t border-zinc-200 text-center text-zinc-500 text-sm">
+        <p>&copy; 2026 Rivi Silva Esmalteria. Todos os direitos reservados. Design Clean Gold.</p>
+    </footer>
+
     <script>
-        // CONEXÃO DIRETA COM O SEU BANCO
+        // CONFIGURAÇÃO DO SEU BANCO (Copie do seu Supabase)
         const supabaseUrl = 'https://rahubkowehwtvditbhlx.supabase.co';
-        const supabaseKey = 'SUA_CHAVE_ANON_AQUI'; // <--- COLOQUE SUA CHAVE AQUI
+        // ATENÇÃO: COLOQUE SUA CHAVE ANON AQUI:
+        const supabaseKey = 'SUA_CHAVE_ANON_AQUI'; 
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        async function finalizarAgendamento() {
-            // Pega os valores
+        async function agendar() {
+            // Pegar os valores
             const nomeValue = document.getElementById('nome').value;
-            const telefoneValue = document.getElementById('telefone').value;
             const servicoValue = document.getElementById('servico').value;
             const dataValue = document.getElementById('data').value;
-            const horarioValue = document.getElementById('horario').value;
+            const btn = document.querySelector('button');
 
             // Validação simples
-            if(!nomeValue || !servicoValue || !dataValue || !horarioValue) {
-                return alert("Preencha todos os campos, gata! 💅");
+            if(!nomeValue || !servicoValue || !dataValue) {
+                return alert("Falta preencher alguns campos gata! 💅💖");
             }
 
-            // Tenta salvar no banco
+            // Feedback visual no botão
+            btn.innerHTML = "Processando seu luxo... ⏳";
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+
+            // Tentar salvar no banco (Confirme o nome da tabela e colunas no Supabase)
             const { error } = await _supabase
-                .from('agendamentos') // Confirme se o nome da tabela no Supabase é esse
+                .from('agendamentos') // Sua tabela precisa ter esse nome
                 .insert([{ 
-                    cliente_nome: nomeValue, 
-                    telefone: telefoneValue, 
+                    nome_cliente: nomeValue, 
                     servico: servicoValue, 
-                    data: dataValue, 
-                    horario: horarioValue,
-                    status: 'Pendente'
+                    data_hora: dataValue 
                 }]);
 
             if (error) {
-                console.error(error);
-                alert('Erro ao agendar. Verifique a tabela no banco!');
+                console.error('Erro detalhado:', error);
+                alert('Deu um pequeno erro ao agendar. Verifique as configurações da tabela!');
+                // Restaura o botão
+                btn.innerHTML = "CONFIRMAR AGENDAMENTO ✨";
+                btn.disabled = false;
+                btn.style.opacity = '1';
             } else {
-                alert('Agendamento feito com sucesso! ✨ Te esperamos lá.');
-                location.reload(); // Limpa o formulário
+                alert('Agendamento feito com sucesso! Prepara que você vai arrasar! ✨💖💅');
+                location.reload(); // Recarrega a página para limpar
             }
         }
     </script>
