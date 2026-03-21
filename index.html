@@ -30,8 +30,8 @@
     
     <style>
         body {
-            background-color: #FFFFFF; /* Fundo Clean/Branco */
-            color: #0A0A0A; /* Texto Escuro */
+            background-color: #FFFFFF;
+            color: #0A0A0A;
             font-family: 'Montserrat', sans-serif;
             background-image: 
                 radial-gradient(at 10% 10%, rgba(212, 175, 55, 0.03) 0px, transparent 50%);
@@ -43,7 +43,7 @@
         }
         .gold-gradient-bg {
             background: linear-gradient(135deg, #D4AF37 0%, #F5E6A3 100%);
-            color: #FFFFFF; /* Texto Branco no Botão Dourado */
+            color: #FFFFFF;
         }
         .form-input {
             background-color: #FFFFFF !important;
@@ -55,15 +55,18 @@
             box-shadow: 0 0 0 1px #D4AF37 !important;
             outline: none;
         }
+        /* Estilo para seleção múltipla */
+        select[multiple] {
+            height: 160px;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8 flex flex-col items-center min-h-screen">
     
     <header class="w-full max-w-7xl flex flex-col items-center mb-10 mt-4">
-        <div class="h-24 md:h-32 w-24 md:w-32 rounded-full overflow-hidden border-2 border-gold mb-3 shadow-lg">
+        <div class="h-24 md:h-32 w-24 md:w-32 rounded-full overflow-hidden border-2 border-gold mb-3 shadow-lg bg-white">
             <img src="image_5.png" alt="Rivi Silva Logo" class="w-full h-full object-cover">
         </div>
-        
         <p class="font-sans text-xs uppercase tracking-[0.5em] text-zinc-500 text-center">
             ESMALTERIA PREMIVM
         </p>
@@ -76,11 +79,11 @@
                 Seu momento de brilhar começa aqui, <span class="font-semibold text-gold">gata. 💅</span>
             </h2>
             <p class="text-zinc-600 text-lg">
-                Agende o seu horário de forma rápida e segura na Rivi Silva Esmalteria. Escolha o melhor dia, o serviço de luxo que você merece e deixe o resto conosco.
+                Agende o seu horário de forma rápida e segura. Escolha um ou mais serviços de luxo e garanta sua vaga para este mês.
             </p>
             <div class="clean-card p-6 rounded-2xl border-l-4 border-l-gold">
-                <p class="text-sm text-zinc-500">Próximos passos:</p>
-                <p class="text-xl font-medium text-black">Preencha o formulário e receba sua confirmação instantânea.</p>
+                <p class="text-sm text-zinc-500 font-bold uppercase tracking-widest mb-1">Dica da Rivi:</p>
+                <p class="text-xl font-medium text-black">Segure 'Ctrl' ou arraste para selecionar mais de um serviço!</p>
             </div>
         </div>
 
@@ -96,18 +99,28 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-2">Serviço Desejado</label>
-                    <select id="servico" class="form-input w-full p-4 rounded-xl text-lg cursor-pointer">
-                        <option value="" disabled selected>Selecione...</option>
-                        <option value="Alongamento Gel">Alongamento em Gel (Premium)</option>
-                        <option value="Banho Gel">Banho de Gel (Brilho Intenso)</option>
-                        <option value="Manicure Simples">Manicure Simples (Clássica)</option>
-                        <option value="Pedicure Simples">Pedicure Simples</option>
-                    </select>
+                    <label class="block text-sm font-medium text-zinc-700 mb-2">WhatsApp / Telefone</label>
+                    <input id="telefone" type="tel" placeholder="(00) 90000-0000" class="form-input w-full p-4 rounded-xl text-lg">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-2">Data e Hora</label>
+                    <label class="block text-sm font-medium text-zinc-700 mb-2">Serviços Desejados (Pode escolher vários)</label>
+                    <select id="servico" multiple onchange="calcularTotal()" class="form-input w-full p-4 rounded-xl text-lg cursor-pointer">
+                        <option value="Alongamento Gel" data-preco="120">Alongamento em Gel - R$ 120</option>
+                        <option value="Banho Gel" data-preco="80">Banho de Gel - R$ 80</option>
+                        <option value="Manicure Simples" data-preco="40">Manicure Simples - R$ 40</option>
+                        <option value="Pedicure Simples" data-preco="45">Pedicure Simples - R$ 45</option>
+                        <option value="Esmaltação Gel" data-preco="60">Esmaltação em Gel - R$ 60</option>
+                    </select>
+                </div>
+
+                <div id="box-valor" class="bg-amber-50 border border-gold/20 p-4 rounded-xl flex justify-between items-center">
+                    <span class="text-zinc-600 font-medium">Total Estimado:</span>
+                    <span class="text-gold font-bold text-2xl">R$ <span id="total-valor">0,00</span></span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-zinc-700 mb-2">Data e Hora (Apenas mês atual)</label>
                     <input id="data" type="datetime-local" class="form-input w-full p-4 rounded-xl text-lg cursor-pointer">
                 </div>
 
@@ -119,53 +132,76 @@
 
     </main>
 
-    <footer class="w-full max-w-7xl mt-20 pt-8 border-t border-zinc-200 text-center text-zinc-500 text-sm">
-        <p>&copy; 2026 Rivi Silva Esmalteria. Todos os direitos reservados. Design Clean Gold.</p>
+    <footer class="w-full max-w-7xl mt-20 pt-8 border-t border-zinc-200 text-center text-zinc-500 text-sm pb-10">
+        <p>&copy; 2026 Rivi Silva Esmalteria. Design Clean Gold Luxury.</p>
     </footer>
 
     <script>
-        // CONFIGURAÇÃO DO SEU BANCO (Copie do seu Supabase)
+        // Trava de calendário para o mês atual
+        const dataInput = document.getElementById('data');
+        const agora = new Date();
+        const ano = agora.getFullYear();
+        const mes = String(agora.getMonth() + 1).padStart(2, '0');
+        const dia = String(agora.getDate()).padStart(2, '0');
+        const hora = String(agora.getHours()).padStart(2, '0');
+        const min = String(agora.getMinutes()).padStart(2, '0');
+
+        // Define o mínimo como "agora" e o máximo como o último dia deste mês
+        const ultimoDiaMes = new Date(ano, agora.getMonth() + 1, 0).getDate();
+        
+        dataInput.min = `${ano}-${mes}-${dia}T${hora}:${min}`;
+        dataInput.max = `${ano}-${mes}-${ultimoDiaMes}T23:59`;
+
+        function calcularTotal() {
+            const select = document.getElementById('servico');
+            let total = 0;
+            const selecionados = Array.from(select.selectedOptions);
+            
+            selecionados.forEach(opt => {
+                total += parseFloat(opt.getAttribute('data-preco'));
+            });
+
+            document.getElementById('total-valor').innerText = total.toFixed(2).replace('.', ',');
+        }
+
         const supabaseUrl = 'https://rahubkowehwtvditbhlx.supabase.co';
-        // ATENÇÃO: COLOQUE SUA CHAVE ANON AQUI:
         const supabaseKey = 'SUA_CHAVE_ANON_AQUI'; 
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
         async function agendar() {
-            // Pegar os valores
-            const nomeValue = document.getElementById('nome').value;
-            const servicoValue = document.getElementById('servico').value;
-            const dataValue = document.getElementById('data').value;
+            const nome = document.getElementById('nome').value;
+            const telefone = document.getElementById('telefone').value;
+            const data = document.getElementById('data').value;
+            const valorTotal = document.getElementById('total-valor').innerText;
             const btn = document.querySelector('button');
 
-            // Validação simples
-            if(!nomeValue || !servicoValue || !dataValue) {
-                return alert("Falta preencher alguns campos gata! 💅💖");
+            // Pega todos os serviços selecionados em uma string
+            const servicos = Array.from(document.getElementById('servico').selectedOptions).map(opt => opt.value).join(', ');
+
+            if(!nome || !telefone || !servicos || !data) {
+                return alert("Preencha todos os dados gata! 💅💖");
             }
 
-            // Feedback visual no botão
-            btn.innerHTML = "Processando seu luxo... ⏳";
+            btn.innerHTML = "Agendando seu luxo... ⏳";
             btn.disabled = true;
-            btn.style.opacity = '0.7';
 
-            // Tentar salvar no banco (Confirme o nome da tabela e colunas no Supabase)
             const { error } = await _supabase
-                .from('agendamentos') // Sua tabela precisa ter esse nome
+                .from('agendamentos')
                 .insert([{ 
-                    nome_cliente: nomeValue, 
-                    servico: servicoValue, 
-                    data_hora: dataValue 
+                    nome_cliente: nome, 
+                    telefone: telefone,
+                    servico: servicos, 
+                    valor_total: valorTotal,
+                    data_hora: data 
                 }]);
 
             if (error) {
-                console.error('Erro detalhado:', error);
-                alert('Deu um pequeno erro ao agendar. Verifique as configurações da tabela!');
-                // Restaura o botão
+                alert('Erro ao agendar. Verifique as colunas da tabela!');
                 btn.innerHTML = "CONFIRMAR AGENDAMENTO ✨";
                 btn.disabled = false;
-                btn.style.opacity = '1';
             } else {
-                alert('Agendamento feito com sucesso! Prepara que você vai arrasar! ✨💖💅');
-                location.reload(); // Recarrega a página para limpar
+                alert('Agendamento feito! Prepara que você vai arrasar! ✨💅');
+                location.reload();
             }
         }
     </script>
