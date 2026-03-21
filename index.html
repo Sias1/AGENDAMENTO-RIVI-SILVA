@@ -55,16 +55,16 @@
             box-shadow: 0 0 0 1px #D4AF37 !important;
             outline: none;
         }
-        /* Estilo para seleção múltipla */
+        /* Estilo para a lista de serviços */
         select[multiple] {
-            height: 160px;
+            height: 150px;
         }
     </style>
 </head>
 <body class="p-4 md:p-8 flex flex-col items-center min-h-screen">
     
     <header class="w-full max-w-7xl flex flex-col items-center mb-10 mt-4">
-        <div class="h-24 md:h-32 w-24 md:w-32 rounded-full overflow-hidden border-2 border-gold mb-3 shadow-lg bg-white">
+        <div class="h-24 md:h-32 w-24 md:w-32 rounded-full overflow-hidden border-2 border-gold mb-3 shadow-lg">
             <img src="image_5.png" alt="Rivi Silva Logo" class="w-full h-full object-cover">
         </div>
         <p class="font-sans text-xs uppercase tracking-[0.5em] text-zinc-500 text-center">
@@ -79,11 +79,11 @@
                 Seu momento de brilhar começa aqui, <span class="font-semibold text-gold">gata. 💅</span>
             </h2>
             <p class="text-zinc-600 text-lg">
-                Agende o seu horário de forma rápida e segura. Escolha um ou mais serviços de luxo e garanta sua vaga para este mês.
+                Agende o seu horário de forma rápida e segura na Rivi Silva Esmalteria. Escolha o melhor dia, o serviço de luxo que você merece e deixe o resto conosco.
             </p>
             <div class="clean-card p-6 rounded-2xl border-l-4 border-l-gold">
-                <p class="text-sm text-zinc-500 font-bold uppercase tracking-widest mb-1">Dica da Rivi:</p>
-                <p class="text-xl font-medium text-black">Segure 'Ctrl' ou arraste para selecionar mais de um serviço!</p>
+                <p class="text-sm text-zinc-500">Próximos passos:</p>
+                <p class="text-xl font-medium text-black">Preencha o formulário e receba sua confirmação instantânea.</p>
             </div>
         </div>
 
@@ -104,17 +104,17 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-2">Serviços Desejados (Pode escolher vários)</label>
+                    <label class="block text-sm font-medium text-zinc-700 mb-2">Serviços Desejados (Selecione um ou mais)</label>
                     <select id="servico" multiple onchange="calcularTotal()" class="form-input w-full p-4 rounded-xl text-lg cursor-pointer">
                         <option value="Alongamento Gel" data-preco="120">Alongamento em Gel - R$ 120</option>
                         <option value="Banho Gel" data-preco="80">Banho de Gel - R$ 80</option>
                         <option value="Manicure Simples" data-preco="40">Manicure Simples - R$ 40</option>
                         <option value="Pedicure Simples" data-preco="45">Pedicure Simples - R$ 45</option>
-                        <option value="Esmaltação Gel" data-preco="60">Esmaltação em Gel - R$ 60</option>
+                        <option value="Combo Pé e Mão" data-preco="80">Combo Pé e Mão - R$ 80</option>
                     </select>
                 </div>
 
-                <div id="box-valor" class="bg-amber-50 border border-gold/20 p-4 rounded-xl flex justify-between items-center">
+                <div class="bg-amber-50 border border-gold/20 p-4 rounded-xl flex justify-between items-center">
                     <span class="text-zinc-600 font-medium">Total Estimado:</span>
                     <span class="text-gold font-bold text-2xl">R$ <span id="total-valor">0,00</span></span>
                 </div>
@@ -124,7 +124,7 @@
                     <input id="data" type="datetime-local" class="form-input w-full p-4 rounded-xl text-lg cursor-pointer">
                 </div>
 
-                <button onclick="agendar()" class="w-full gold-gradient-bg font-bold py-5 rounded-xl text-lg uppercase tracking-widest hover:brightness-110 transition duration-300 transform hover:scale-[1.01] active:scale-[0.99] shadow-md shadow-gold/20">
+                <button onclick="agendar()" class="w-full gold-gradient-bg font-bold py-5 rounded-xl text-lg uppercase tracking-widest hover:brightness-110 transition duration-300 shadow-md shadow-gold/20">
                     CONFIRMAR AGENDAMENTO ✨
                 </button>
             </div>
@@ -133,34 +133,28 @@
     </main>
 
     <footer class="w-full max-w-7xl mt-20 pt-8 border-t border-zinc-200 text-center text-zinc-500 text-sm pb-10">
-        <p>&copy; 2026 Rivi Silva Esmalteria. Design Clean Gold Luxury.</p>
+        <p>&copy; 2026 Rivi Silva Esmalteria. Todos os direitos reservados.</p>
     </footer>
 
     <script>
-        // Trava de calendário para o mês atual
+        // Restrição de datas para o mês vigente
         const dataInput = document.getElementById('data');
-        const agora = new Date();
-        const ano = agora.getFullYear();
-        const mes = String(agora.getMonth() + 1).padStart(2, '0');
-        const dia = String(agora.getDate()).padStart(2, '0');
-        const hora = String(agora.getHours()).padStart(2, '0');
-        const min = String(agora.getMinutes()).padStart(2, '0');
-
-        // Define o mínimo como "agora" e o máximo como o último dia deste mês
-        const ultimoDiaMes = new Date(ano, agora.getMonth() + 1, 0).getDate();
+        const hoje = new Date();
+        const ano = hoje.getFullYear();
+        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        const dia = String(hoje.getDate()).padStart(2, '0');
         
-        dataInput.min = `${ano}-${mes}-${dia}T${hora}:${min}`;
-        dataInput.max = `${ano}-${mes}-${ultimoDiaMes}T23:59`;
+        const ultimoDia = new Date(ano, hoje.getMonth() + 1, 0).getDate();
+        
+        dataInput.min = `${ano}-${mes}-${dia}T08:00`;
+        dataInput.max = `${ano}-${mes}-${ultimoDia}T21:00`;
 
         function calcularTotal() {
             const select = document.getElementById('servico');
             let total = 0;
-            const selecionados = Array.from(select.selectedOptions);
-            
-            selecionados.forEach(opt => {
+            Array.from(select.selectedOptions).forEach(opt => {
                 total += parseFloat(opt.getAttribute('data-preco'));
             });
-
             document.getElementById('total-valor').innerText = total.toFixed(2).replace('.', ',');
         }
 
@@ -173,16 +167,14 @@
             const telefone = document.getElementById('telefone').value;
             const data = document.getElementById('data').value;
             const valorTotal = document.getElementById('total-valor').innerText;
-            const btn = document.querySelector('button');
-
-            // Pega todos os serviços selecionados em uma string
-            const servicos = Array.from(document.getElementById('servico').selectedOptions).map(opt => opt.value).join(', ');
+            const servicos = Array.from(document.getElementById('servico').selectedOptions).map(o => o.value).join(', ');
 
             if(!nome || !telefone || !servicos || !data) {
-                return alert("Preencha todos os dados gata! 💅💖");
+                return alert("Preencha todos os campos gata! 💅💖");
             }
 
-            btn.innerHTML = "Agendando seu luxo... ⏳";
+            const btn = document.querySelector('button');
+            btn.innerHTML = "Agendando... ⏳";
             btn.disabled = true;
 
             const { error } = await _supabase
@@ -196,11 +188,11 @@
                 }]);
 
             if (error) {
-                alert('Erro ao agendar. Verifique as colunas da tabela!');
+                alert('Erro ao agendar. Tente novamente!');
                 btn.innerHTML = "CONFIRMAR AGENDAMENTO ✨";
                 btn.disabled = false;
             } else {
-                alert('Agendamento feito! Prepara que você vai arrasar! ✨💅');
+                alert('Sucesso! Te esperamos lá! ✨💅');
                 location.reload();
             }
         }
