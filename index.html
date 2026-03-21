@@ -20,13 +20,9 @@
     </script>
     <style>
         body { 
-            background-color: #F9F9F9; 
+            background-color: #F9F9F9; /* Fundo Clean */
             color: #1A1A1A; 
             font-family: sans-serif;
-            /* Detalhe dourado sutil no fundo para não ficar "vazio" */
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(212, 175, 55, 0.05) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(212, 175, 55, 0.05) 0px, transparent 50%);
         }
         .form-input { 
             background-color: #FFFFFF; 
@@ -38,20 +34,14 @@
             outline: none; 
             box-shadow: 0 0 0 1px #D4AF37;
         }
+        /* Estilo para a logo redonda */
         .logo-circle {
             width: 120px;
             height: 120px;
             border-radius: 50%;
             border: 3px solid #D4AF37;
             object-fit: cover;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            background: white;
-        }
-        .price-badge {
-            background-color: #FFFDF2;
-            border: 1px dashed #D4AF37;
-            color: #D4AF37;
-            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
     </style>
 </head>
@@ -73,26 +63,19 @@
             </div>
             
             <div>
-                <label class="block mb-1 text-sm text-zinc-500 font-medium">Telefone / WhatsApp</label>
+                <label class="block mb-1 text-sm text-zinc-500 font-medium">Telefone</label>
                 <input id="telefone" type="tel" placeholder="(00) 90000-0000" class="form-input w-full p-3 rounded-lg">
             </div>
 
             <div>
                 <label class="block mb-1 text-sm text-zinc-500 font-medium">Serviço</label>
-                <select id="servico" onchange="atualizarPreco()" class="form-input w-full p-3 rounded-lg cursor-pointer">
+                <select id="servico" class="form-input w-full p-3 rounded-lg cursor-pointer">
                     <option value="" disabled selected>Selecione um serviço...</option>
-                    <option value="Alongamento em Gel" data-preco="120,00">Alongamento em Gel</option>
-                    <option value="Banho de Gel" data-preco="80,00">Banho de Gel</option>
-                    <option value="Manicure Simples" data-preco="40,00">Manicure Simples</option>
-                    <option value="Pedicure" data-preco="45,00">Pedicure</option>
-                    <option value="Combo Pé e Mão" data-preco="80,00">Combo Pé e Mão</option>
+                    <option>Alongamento em Gel</option>
+                    <option>Banho de Gel</option>
+                    <option>Manicure Simples</option>
+                    <option>Pedicure</option>
                 </select>
-            </div>
-
-            <div id="area-preco" class="hidden animate-pulse">
-                <div class="price-badge p-3 rounded-lg text-center text-lg">
-                    Valor: R$ <span id="valor-servico">0,00</span>
-                </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
@@ -112,51 +95,36 @@
         </div>
     </main>
 
-    <footer class="mt-10 text-zinc-400 text-xs text-center pb-6">
+    <footer class="mt-10 text-zinc-400 text-xs text-center">
         © 2026 Rivi Silva Esmalteria - Luxury Service
     </footer>
 
     <script>
-        // Função para mostrar o preço na hora
-        function atualizarPreco() {
-            const select = document.getElementById('servico');
-            const areaPreco = document.getElementById('area-preco');
-            const valorSpan = document.getElementById('valor-servico');
-            
-            const preco = select.options[select.selectedIndex].getAttribute('data-preco');
-
-            if (preco) {
-                valorSpan.innerText = preco;
-                areaPreco.classList.remove('hidden');
-            }
-        }
-
-        // CONEXÃO COM O SUPABASE
+        // CONEXÃO DIRETA COM O SEU BANCO
         const supabaseUrl = 'https://rahubkowehwtvditbhlx.supabase.co';
-        const supabaseKey = 'SUA_CHAVE_ANON_AQUI'; // <--- COLOQUE SUA CHAVE AQUI
+        // COLOQUE SUA CHAVE ANON ABAIXO
+        const supabaseKey = 'SUA_CHAVE_ANON_AQUI'; 
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
         async function finalizarAgendamento() {
-            const nome = document.getElementById('nome').value;
-            const telefone = document.getElementById('telefone').value;
-            const servico = document.getElementById('servico').value;
-            const data = document.getElementById('data').value;
-            const horario = document.getElementById('horario').value;
-            const valor = document.getElementById('valor-servico').innerText;
+            const nomeValue = document.getElementById('nome').value;
+            const telefoneValue = document.getElementById('telefone').value;
+            const servicoValue = document.getElementById('servico').value;
+            const dataValue = document.getElementById('data').value;
+            const horarioValue = document.getElementById('horario').value;
 
-            if(!nome || !telefone || !servico || !data || !horario) {
+            if(!nomeValue || !servicoValue || !dataValue || !horarioValue) {
                 return alert("Preencha todos os campos, gata! 💅");
             }
 
             const { error } = await _supabase
                 .from('agendamentos')
                 .insert([{ 
-                    cliente_nome: nome, 
-                    telefone: telefone, 
-                    servico: servico, 
-                    valor: valor,
-                    data: data, 
-                    horario: horario,
+                    cliente_nome: nomeValue, 
+                    telefone: telefoneValue, 
+                    servico: servicoValue, 
+                    data: dataValue, 
+                    horario: horarioValue,
                     status: 'Pendente'
                 }]);
 
