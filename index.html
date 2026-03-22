@@ -88,12 +88,10 @@
         let horaSelecionada = null;
         const horariosPadrao = ["08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
 
-        // 1. Inicia o Calendário consultando bloqueios
         async function init() {
             const container = document.getElementById('calendarDays');
             const hoje = new Date();
             
-            // Busca dias bloqueados na tabela 'agenda_bloqueada'
             const { data: bloqueios } = await _supabase.from('agenda_bloqueada').select('data_interditada');
             const listaBloqueados = bloqueios?.map(b => b.data_interditada) || [];
 
@@ -117,21 +115,25 @@
             carregarServicos();
         }
 
-        // 2. Busca horários já agendados no Supabase para o dia clicado
         async function carregarHorarios(el, data) {
             document.querySelectorAll('.day-box').forEach(d => d.classList.remove('day-selected'));
             el.classList.add('day-selected');
             dataSelecionada = data;
+            horaSelecionada = null; // Reseta a seleção de hora ao mudar o dia
             
             document.getElementById('section-horarios').classList.remove('hidden');
             document.getElementById('display-date').innerText = data.split('-').reverse().join('/');
 
-            // CONSULTA REAL: Pega horários já salvos na tabela 'agendamentos'
-            const { data: ocupados } = await _supabase.from('agendamentos')
+            // CONSULTA COM FILTRO DE DATA
+            const { data: ocupados, error } = await _supabase
+                .from('agendamentos')
                 .select('horario_agendado')
                 .eq('data_agendada', data);
             
-            const listaOcupados = ocupados?.map(o => o.horario_agendado.substring(0, 5)) || [];
+            if(error) console.error("Erro ao buscar horários:", error);
+
+            // Garante que o formato do horário seja apenas HH:mm para comparação
+            const listaOcupados = ocupados?.map(o => o.horario_agendado.trim().substring(0, 5)) || [];
 
             const slots = document.getElementById('time-slots');
             slots.innerHTML = '';
@@ -139,7 +141,7 @@
             horariosPadrao.forEach(h => {
                 const isOcupado = listaOcupados.includes(h);
                 const btn = document.createElement('div');
-                btn.className = `time-slot ${isOcupado ? 'occupied' : ''}`;
+                btn.className = `time-slot ${isOcupado ? 'occupied' : 'hover:border-gold'}`;
                 btn.innerText = h;
                 
                 if(!isOcupado) {
@@ -185,14 +187,24 @@
             }
 
             btn.innerText = "RESERVANDO... ✨";
+            btn.disabled = true;
+
             const { error } = await _supabase.from('agendamentos').insert([{
-                cliente_nome: nome, cliente_whatsapp: zap,
-                data_agendada: dataSelecionada, horario_agendado: horaSelecionada,
+                cliente_nome: nome, 
+                cliente_whatsapp: zap,
+                data_agendada: dataSelecionada, 
+                horario_agendado: horaSelecionada,
                 servico_id: svs[0]
             }]);
 
-            if(error) alert(error.message);
-            else { alert("AGENDADO COM SUCESSO! 💖"); location.reload(); }
+            if(error) {
+                alert(error.message);
+                btn.innerText = "CONFIRMAR AGENDAMENTO ✨";
+                btn.disabled = false;
+            } else {
+                alert("AGENDADO COM SUCESSO! 💖");
+                location.reload();
+            }
         }
 
         init();
