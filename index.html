@@ -13,16 +13,14 @@
         .gold-bg { background: linear-gradient(135deg, #D4AF37 0%, #F5E6A3 100%); }
         .clean-card { background-color: #FDFDFD; border: 1px solid rgba(212, 175, 55, 0.15); box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05); }
         
-        /* Grid do Calendário */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
         .day-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; transition: 0.3s; border: 1px solid #f0f0f0; font-weight: 600; font-size: 0.9rem; }
         .day-free { background: #f0fdf4; color: #166534; border-color: #bbf7d0; } 
         .day-busy { background: #fef2f2; color: #991b1b; border-color: #fecaca; cursor: not-allowed; opacity: 0.5; }
-        .day-selected { background: #D4AF37 !important; color: white !important; border-color: #B8860B !important; transform: scale(1.05); box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3); }
+        .day-selected { background: #D4AF37 !important; color: white !important; border-color: #B8860B !important; transform: scale(1.05); }
         
-        /* Horários */
         .time-slot { padding: 12px; border: 1px solid #e5e7eb; border-radius: 10px; text-align: center; cursor: pointer; transition: 0.2s; background: white; font-weight: 500; }
-        .time-slot:hover:not(.occupied) { border-color: #D4AF37; color: #D4AF37; background: #fffdf5; }
+        .time-slot:hover:not(.occupied) { border-color: #D4AF37; color: #D4AF37; }
         .time-selected { background: #D4AF37 !important; color: white !important; border-color: #D4AF37 !important; }
         .occupied { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; text-decoration: line-through; }
     </style>
@@ -38,11 +36,8 @@
 
     <main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
         
-        <div class="flex flex-col gap-8">
-            <h2 class="text-4xl font-light text-zinc-900 leading-tight">
-                Seu momento de brilhar começa aqui, <span class="font-semibold gold-text">gata. 💅</span>
-            </h2>
-            
+        <div class="flex flex-col gap-6">
+            <h2 class="text-3xl font-light text-zinc-900">1. Escolha o <span class="font-semibold gold-text">Melhor Dia</span></h2>
             <div class="clean-card p-6 rounded-3xl">
                 <div class="flex justify-between items-center mb-6">
                     <h3 id="monthName" class="font-bold text-lg text-zinc-800 capitalize">Março 2026</h3>
@@ -51,47 +46,35 @@
                     <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
                 </div>
                 <div id="calendarDays" class="calendar-grid"></div>
-                <div class="mt-6 flex justify-center gap-4 text-[10px] font-bold uppercase tracking-widest">
-                    <div class="flex items-center gap-1"><span class="w-3 h-3 day-free rounded"></span> Livre</div>
-                    <div class="flex items-center gap-1"><span class="w-3 h-3 day-busy rounded"></span> Ocupado</div>
-                </div>
             </div>
         </div>
 
-        <div class="w-full clean-card p-8 md:p-10 rounded-3xl">
-            <div id="no-date-msg" class="text-center py-20 text-zinc-400">
-                <p class="text-4xl mb-4">✨</p>
-                <p>Escolha um dia no calendário para <br> liberar os horários disponíveis.</p>
+        <div class="w-full clean-card p-8 md:p-10 rounded-3xl space-y-6">
+            <h2 class="text-2xl font-light text-zinc-900 italic">2. Seus <span class="font-semibold gold-text">Detalhes</span></h2>
+            
+            <div class="space-y-4">
+                <input id="nome" type="text" placeholder="Seu Nome Completo" class="w-full p-4 border rounded-2xl outline-none focus:border-gold">
+                <input id="whatsapp" type="tel" placeholder="WhatsApp (DDD) 00000-0000" class="w-full p-4 border rounded-2xl outline-none focus:border-gold">
             </div>
 
-            <div id="booking-form" class="hidden space-y-6">
-                <h3 class="text-xl font-bold border-b pb-4 gold-text">Agendar para o dia <span id="display-date">--/--</span></h3>
+            <div id="section-horarios" class="hidden space-y-4">
+                <label class="block text-xs font-bold text-zinc-400 uppercase tracking-widest">Horários para <span id="display-date" class="gold-text">--/--</span></label>
+                <div id="time-slots" class="grid grid-cols-3 gap-2"></div>
+            </div>
+
+            <div class="space-y-4">
+                <label class="block text-xs font-bold text-zinc-400 uppercase tracking-widest">Selecione os Serviços</label>
+                <div id="listaServicos" class="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto p-2 border rounded-xl bg-white"></div>
                 
-                <div class="space-y-4">
-                    <label class="block text-xs font-bold text-zinc-400 uppercase">1. Escolha a Hora</label>
-                    <div id="time-slots" class="grid grid-cols-3 gap-2"></div>
+                <div class="bg-zinc-900 p-5 rounded-2xl flex justify-between items-center">
+                    <span class="text-zinc-400 text-sm">Total Estimado:</span>
+                    <span id="totalPrice" class="text-white font-bold text-2xl">R$ 0,00</span>
                 </div>
-
-                <div class="space-y-4">
-                    <label class="block text-xs font-bold text-zinc-400 uppercase">2. Seus Dados</label>
-                    <input id="nome" type="text" placeholder="Nome Completo" class="w-full p-4 border rounded-2xl outline-none focus:border-gold">
-                    <input id="whatsapp" type="tel" placeholder="WhatsApp (DDD)" class="w-full p-4 border rounded-2xl outline-none focus:border-gold">
-                </div>
-
-                <div class="space-y-4">
-                    <label class="block text-xs font-bold text-zinc-400 uppercase">3. Selecione os Serviços</label>
-                    <div id="listaServicos" class="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto p-2 border rounded-xl bg-white"></div>
-                    
-                    <div class="bg-zinc-900 p-5 rounded-2xl flex justify-between items-center">
-                        <span class="text-zinc-400">Total:</span>
-                        <span id="totalPrice" class="text-white font-bold text-2xl">R$ 0,00</span>
-                    </div>
-                </div>
-
-                <button id="btnFinalizar" onclick="finalizar()" class="w-full gold-bg text-white font-bold py-5 rounded-2xl shadow-lg hover:brightness-110 transition uppercase tracking-widest">
-                    Confirmar Agendamento ✨
-                </button>
             </div>
+
+            <button id="btnFinalizar" onclick="finalizar()" class="w-full gold-bg text-white font-bold py-5 rounded-2xl shadow-lg hover:brightness-110 transition uppercase tracking-widest">
+                Confirmar Agendamento ✨
+            </button>
         </div>
     </main>
 
@@ -108,61 +91,51 @@
         async function init() {
             const container = document.getElementById('calendarDays');
             const dataAtual = new Date();
-            const ano = dataAtual.getFullYear();
-            const mes = dataAtual.getMonth();
-
             const { data: bloqueios } = await _supabase.from('agenda_bloqueada').select('data_interditada');
             const bloqueados = bloqueios?.map(b => b.data_interditada) || [];
 
-            const primeiroDia = new Date(ano, mes, 1).getDay();
-            const totalDias = new Date(ano, mes + 1, 0).getDate();
+            const primeiroDia = new Date(dataAtual.getFullYear(), dataAtual.getMonth(), 1).getDay();
+            const totalDias = new Date(dataAtual.getFullYear(), dataAtual.getMonth() + 1, 0).getDate();
 
             container.innerHTML = '';
             for(let i=0; i<primeiroDia; i++) container.innerHTML += '<div></div>';
 
             for(let d=1; d<=totalDias; d++) {
-                const dataStr = `${ano}-${String(mes+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const dataStr = `${dataAtual.getFullYear()}-${String(dataAtual.getMonth()+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                 const isPast = new Date(dataStr) < new Date().setHours(0,0,0,0);
                 const isBlocked = bloqueados.includes(dataStr);
                 
                 const box = document.createElement('div');
                 box.className = `day-box ${ (isPast || isBlocked) ? 'day-busy' : 'day-free' }`;
                 box.innerText = d;
-                
-                if(!isPast && !isBlocked) {
-                    box.onclick = () => clicarNoDia(box, dataStr);
-                }
+                if(!isPast && !isBlocked) box.onclick = () => selecionarDia(box, dataStr);
                 container.appendChild(box);
             }
             carregarServicos();
         }
 
-        async function clicarNoDia(el, data) {
+        async function selecionarDia(el, data) {
             document.querySelectorAll('.day-box').forEach(d => d.classList.remove('day-selected'));
             el.classList.add('day-selected');
             diaSelecionado = data;
-            
-            document.getElementById('no-date-msg').classList.add('hidden');
-            document.getElementById('booking-form').classList.remove('hidden');
+            document.getElementById('section-horarios').classList.remove('hidden');
             document.getElementById('display-date').innerText = data.split('-').reverse().join('/');
 
             const { data: ocupados } = await _supabase.from('agendamentos').select('horario_agendado').eq('data_agendada', data);
-            const hrsOcupadas = ocupados?.map(o => o.horario_agendado.substring(0, 5)) || [];
+            const ocupadosList = ocupados?.map(o => o.horario_agendado.substring(0, 5)) || [];
 
             const slots = document.getElementById('time-slots');
             slots.innerHTML = '';
             horariosBase.forEach(h => {
-                const isOcupado = hrsOcupadas.includes(h);
+                const isOcupado = ocupadosList.includes(h);
                 const btn = document.createElement('div');
                 btn.className = `time-slot ${isOcupado ? 'occupied' : ''}`;
                 btn.innerText = h;
-                if(!isOcupado) {
-                    btn.onclick = () => {
-                        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('time-selected'));
-                        btn.classList.add('time-selected');
-                        horaSelecionada = h;
-                    };
-                }
+                if(!isOcupado) btn.onclick = () => {
+                    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('time-selected'));
+                    btn.classList.add('time-selected');
+                    horaSelecionada = h;
+                };
                 slots.appendChild(btn);
             });
         }
@@ -191,19 +164,16 @@
         async function finalizar() {
             const nome = document.getElementById('nome').value;
             const zap = document.getElementById('whatsapp').value;
-            const svs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
-
-            if(!nome || !zap || !horaSelecionada || svs.length === 0) return alert("Falta algo, gata! 💅");
-
-            document.getElementById('btnFinalizar').innerText = "RESERVANDO... ✨";
+            if(!nome || !zap || !diaSelecionado || !horaSelecionada) return alert("Preencha tudo gata! Escolha o dia e o horário. 💅");
+            
             const { error } = await _supabase.from('agendamentos').insert([{
                 cliente_nome: nome, cliente_whatsapp: zap,
                 data_agendada: diaSelecionado, horario_agendado: horaSelecionada,
-                servico_id: svs[0]
+                servico_id: document.querySelector('input[type="checkbox"]:checked').value
             }]);
 
             if(error) alert(error.message);
-            else { alert("AGENDADO! ✨"); location.reload(); }
+            else { alert("Agendado com sucesso! ✨"); location.reload(); }
         }
 
         init();
