@@ -115,7 +115,6 @@
                 </button>
             </div>
         </div>
-
     </main>
 
     <footer class="w-full max-w-7xl mt-20 pt-8 border-t border-zinc-200 text-center text-zinc-500 text-sm">
@@ -123,12 +122,12 @@
     </footer>
 
     <script>
-        // CONFIGURAÇÃO
+        // CONFIGURAÇÃO DO SEU PROJETO REAL NO SUPABASE
         const supabaseUrl = 'https://rahubkowehwtvditbhlx.supabase.co';
         const supabaseKey = 'sb_publishable_wKbs4gYVURdIR6Cafm8qFA_tUZZTIKo'; 
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // 1. CARREGA SERVIÇOS REAIS DO BANCO
+        // 1. CARREGA SERVIÇOS DO BANCO
         async function carregarServicos() {
             const selectServico = document.getElementById('servico');
             try {
@@ -148,7 +147,7 @@
         }
         carregarServicos();
 
-        // 2. FUNÇÃO PRINCIPAL DE AGENDAMENTO
+        // 2. FUNÇÃO DE AGENDAMENTO COM VALIDAÇÃO REAL
         async function agendar() {
             const nome = document.getElementById('nome').value;
             const whatsapp = document.getElementById('whatsapp').value;
@@ -160,36 +159,37 @@
                 return alert("Falta preencher alguns campos gata! 💅💖");
             }
 
-            // Separar Data e Hora
+            // Separação correta para o banco (Date vs Time)
             const [dataAgendada, horarioAgendado] = dataHora.split('T');
-            const mesAno = dataAgendada.substring(0, 7); // Ex: 2026-03
+            const mesAno = dataAgendada.substring(0, 7); 
 
             btn.innerHTML = "VERIFICANDO DISPONIBILIDADE... ⏳";
             btn.disabled = true;
 
             try {
-                // VERIFICAÇÃO 1: Mês Liberado (Cadeado do Painel)
+                // VERIFICAÇÃO 1: Mês Liberado?
                 const { data: mesData } = await _supabase
                     .from('meses_liberados')
                     .select('liberado')
                     .eq('mes_ano', mesAno)
-                    .single();
+                    .maybeSingle();
 
                 if (!mesData || !mesData.liberado) {
                     throw new Error("A agenda para este mês ainda não foi liberada pela Rivi! 🔒");
                 }
 
-                // VERIFICAÇÃO 2: Dia Bloqueado (Agenda Bloqueada do Painel)
+                // VERIFICAÇÃO 2: Dia Bloqueado?
                 const { data: diaData } = await _supabase
                     .from('agenda_bloqueada')
                     .select('*')
-                    .eq('data_interditada', dataAgendada);
+                    .eq('data_interditada', dataAgendada)
+                    .maybeSingle();
 
-                if (diaData && diaData.length > 0) {
+                if (diaData) {
                     throw new Error("A Rivi não atenderá nesta data escolhida. Escolha outro dia! 🌸");
                 }
 
-                // SALVAMENTO FINAL
+                // SALVAMENTO NO BANCO
                 const { error: insertError } = await _supabase
                     .from('agendamentos')
                     .insert([{ 
