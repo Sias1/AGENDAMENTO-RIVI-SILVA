@@ -53,14 +53,13 @@
             box-shadow: 0 0 0 1px #D4AF37 !important;
             outline: none;
         }
-        /* Estilo para a lista de serviços */
         .service-item {
             transition: all 0.2s;
-            border: 1px solid rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.05);
         }
         .service-item:hover {
             border-color: #D4AF37;
-            background-color: rgba(212, 175, 55, 0.05);
+            background-color: rgba(212, 175, 55, 0.02);
         }
         input[type="checkbox"]:checked + label {
             color: #D4AF37;
@@ -86,16 +85,15 @@
                 Seu momento de brilhar começa aqui, <span class="font-semibold text-gold">gata. 💅</span>
             </h2>
             <p class="text-zinc-600 text-lg">
-                Selecione os serviços desejados. O valor total é calculado automaticamente para você.
+                Agende o seu horário de forma rápida e segura na Rivi Silva Esmalteria. Escolha o melhor dia e o serviço de luxo que você merece.
             </p>
             <div class="clean-card p-6 rounded-2xl border-l-4 border-l-gold">
-                <p class="text-sm text-zinc-500">Valor Total Estimado:</p>
-                <p id="totalDisplay" class="text-3xl font-bold text-black text-gold">R$ 0,00</p>
+                <p class="text-sm text-zinc-500 italic">"Beleza é sobre ser a melhor versão de você mesma."</p>
             </div>
         </div>
 
         <div class="w-full clean-card p-8 md:p-10 rounded-3xl">
-            <h3 class="text-2xl font-semibold mb-8 border-b border-zinc-200 pb-4 text-gold">
+            <h3 class="text-2xl font-semibold mb-8 border-b border-zinc-200 pb-4 text-gold text-center">
                 Solicitar Agendamento
             </h3>
 
@@ -111,9 +109,14 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-4">Escolha seus Serviços</label>
-                    <div id="listaServicos" class="grid grid-cols-1 gap-3 max-h-60 overflow-y-auto pr-2">
+                    <label class="block text-sm font-medium text-zinc-700 mb-3">Escolha os Serviços</label>
+                    <div id="listaServicos" class="grid grid-cols-1 gap-2 max-h-52 overflow-y-auto pr-2 mb-4">
                         <p class="text-zinc-400 italic">Carregando serviços...</p>
+                    </div>
+                    
+                    <div class="bg-zinc-50 p-4 rounded-xl border border-zinc-100 flex justify-between items-center">
+                        <span class="text-zinc-500 font-medium">Total Estimado:</span>
+                        <span id="totalDisplay" class="text-2xl font-bold text-gold">R$ 0,00</span>
                     </div>
                 </div>
 
@@ -137,14 +140,11 @@
         const supabaseUrl = 'https://rahubkowehwtvditbhlx.supabase.co';
         const supabaseKey = 'sb_publishable_wKbs4gYVURdIR6Cafm8qFA_tUZZTIKo'; 
         
-        // Configuração com headers para evitar bloqueios de CORS
-        const _supabase = supabase.createClient(supabaseUrl, supabaseKey, {
-            global: { headers: { 'x-application-name': 'rivi-esmalteria' } }
-        });
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
         let servicosSelecionados = [];
 
-        // Trava o calendário para não aceitar datas passadas
+        // Bloqueia datas passadas
         const agora = new Date();
         agora.setMinutes(agora.getMinutes() - agora.getTimezoneOffset());
         document.getElementById('data').min = agora.toISOString().slice(0, 16);
@@ -162,15 +162,16 @@
                             <div class="service-item flex items-center p-3 rounded-lg cursor-pointer">
                                 <input type="checkbox" id="ser_${s.id}" value="${s.id}" data-preco="${s.preco}" 
                                     onchange="atualizarTotal()" class="w-5 h-5 accent-gold cursor-pointer">
-                                <label for="ser_${s.id}" class="ml-3 flex-1 cursor-pointer text-zinc-800">
-                                    ${s.nome} <span class="text-zinc-400 text-sm ml-2">R$ ${s.preco}</span>
+                                <label for="ser_${s.id}" class="ml-3 flex-1 cursor-pointer text-zinc-800 flex justify-between">
+                                    <span>${s.nome}</span>
+                                    <span class="text-zinc-500">R$ ${s.preco}</span>
                                 </label>
                             </div>
                         `;
                     });
                 }
             } catch (err) {
-                container.innerHTML = '<p class="text-red-500">Erro ao carregar serviços.</p>';
+                container.innerHTML = '<p class="text-red-500">Erro ao conectar serviços.</p>';
             }
         }
 
@@ -194,36 +195,34 @@
             const btn = document.getElementById('btnAgendar');
 
             if(!nome || !whatsapp || servicosSelecionados.length === 0 || !dataHora) {
-                return alert("Preencha tudo gata! Escolha ao menos um serviço. 💅💖");
+                return alert("Falta preencher alguns campos gata! 💅💖");
             }
 
             const [dataAgendada, horarioAgendado] = dataHora.split('T');
             const mesAno = dataAgendada.substring(0, 7); 
 
-            btn.innerHTML = "PROCESSANDO... ⏳";
+            btn.innerHTML = "VERIFICANDO... ⏳";
             btn.disabled = true;
 
             try {
-                // 1. Verifica Mês
                 const { data: mesData } = await _supabase.from('meses_liberados').select('liberado').eq('mes_ano', mesAno).maybeSingle();
-                if (!mesData || !mesData.liberado) throw new Error("Agenda deste mês fechada! 🔒");
+                if (!mesData || !mesData.liberado) throw new Error("Agenda deste mês ainda não foi liberada! 🔒");
 
-                // 2. Verifica Bloqueio
                 const { data: diaData } = await _supabase.from('agenda_bloqueada').select('*').eq('data_interditada', dataAgendada).maybeSingle();
-                if (diaData) throw new Error("Rivi não atende neste dia. 🌸");
+                if (diaData) throw new Error("A Rivi não atenderá nesta data escolhida! 🌸");
 
-                // 3. Salva (Se o banco aceitar Array no servico_id, enviamos todos, senão enviamos o primeiro)
+                // Registra o primeiro serviço selecionado (ou o conjunto se o seu banco aceitar array)
                 const { error: insertError } = await _supabase.from('agendamentos').insert([{ 
                     cliente_nome: nome, 
                     cliente_whatsapp: whatsapp, 
-                    servico_id: servicosSelecionados[0], // Pega o principal
+                    servico_id: servicosSelecionados[0], 
                     data_agendada: dataAgendada,
                     horario_agendado: horarioAgendado 
                 }]);
 
                 if (insertError) throw insertError;
 
-                alert('Agendamento feito! Você vai arrasar! ✨💖');
+                alert('Agendamento feito com sucesso! ✨💖💅');
                 location.reload();
 
             } catch (error) {
