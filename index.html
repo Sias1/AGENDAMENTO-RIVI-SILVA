@@ -83,6 +83,7 @@
         async function init() {
             const container = document.getElementById('calendarDays');
             const hoje = new Date();
+            const hojeDataApenas = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
             const mesAnoKey = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;
 
             const [resConfig, resMeses, resBloqueios] = await Promise.all([
@@ -112,8 +113,11 @@
             for(let i=0; i<primeiroDia; i++) container.innerHTML += '<div></div>';
 
             for(let d=1; d<=totalDias; d++) {
+                const dataComparacao = new Date(hoje.getFullYear(), hoje.getMonth(), d);
                 const dataStr = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                const isPast = new Date(dataStr) < new Date().setHours(0,0,0,0);
+                
+                // Permitir hoje (dataComparacao >= hojeDataApenas)
+                const isPast = dataComparacao < hojeDataApenas;
                 const isBlocked = listaBloqueados.includes(dataStr);
                 
                 const box = document.createElement('div');
@@ -155,13 +159,20 @@
             const slotsDiv = document.getElementById('time-slots');
             slotsDiv.innerHTML = '';
             
+            const agora = new Date();
+            const hojeFormatado = `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`;
+            const horaAtualStr = `${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}`;
+
             horariosParaExibir.forEach(h => {
                 const isOcupado = listaOcupados.includes(h);
+                // Se for hoje, verifica se a hora já passou
+                const jaPassou = (data === hojeFormatado && h <= horaAtualStr);
+                
                 const btn = document.createElement('div');
-                btn.className = `time-slot ${isOcupado ? 'occupied' : 'hover:border-gold'}`;
+                btn.className = `time-slot ${ (isOcupado || jaPassou) ? 'occupied' : 'hover:border-gold'}`;
                 btn.innerText = h;
                 
-                if(!isOcupado) {
+                if(!isOcupado && !jaPassou) {
                     btn.onclick = () => {
                         document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('time-selected'));
                         btn.classList.add('time-selected');
