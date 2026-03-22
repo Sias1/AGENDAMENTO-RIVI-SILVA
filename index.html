@@ -8,64 +8,75 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Montserrat', sans-serif; background: #fdfdfd; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-        .day-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; transition: 0.2s; border: 1px solid #eee; font-size: 0.85rem; }
-        .day-free { background: #ecfdf5; color: #059669; border-color: #a7f3d0; } /* Verde */
-        .day-busy { background: #fef2f2; color: #dc2626; cursor: not-allowed; opacity: 0.6; } /* Vermelho */
-        .day-selected { background: #D4AF37 !important; color: white !important; border-color: #B8860B !important; }
-        .time-slot { padding: 10px; border: 1px solid #ddd; border-radius: 8px; text-align: center; cursor: pointer; }
-        .time-slot:hover { border-color: #D4AF37; color: #D4AF37; }
-        .time-selected { background: #D4AF37; color: white; border-color: #D4AF37; }
+        body { font-family: 'Montserrat', sans-serif; background: #FFF; color: #1a1a1a; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        .day-box { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; transition: 0.3s; border: 1px solid #f0f0f0; position: relative; }
+        .day-free { background: #f0fdf4; color: #166534; border-color: #bbf7d0; } 
+        .day-busy { background: #fef2f2; color: #991b1b; border-color: #fecaca; cursor: not-allowed; }
+        .day-selected { background: #D4AF37 !important; color: white !important; border-color: #B8860B !important; transform: scale(1.05); z-index: 10; box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3); }
+        .time-slot { padding: 12px; border: 1px solid #e5e7eb; border-radius: 10px; text-align: center; cursor: pointer; transition: 0.2s; background: white; }
+        .time-slot:hover:not(.occupied) { border-color: #D4AF37; color: #D4AF37; background: #fffdf5; }
+        .time-selected { background: #D4AF37 !important; color: white !important; border-color: #D4AF37 !important; }
+        .occupied { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; text-decoration: line-through; border-color: #e5e7eb; }
+        .gold-text { color: #D4AF37; }
+        .gold-bg { background: linear-gradient(135deg, #D4AF37 0%, #F5E6A3 100%); }
     </style>
 </head>
-<body class="p-4 md:p-8 flex flex-col items-center">
+<body class="p-4 md:p-8 flex flex-col items-center min-h-screen">
 
-    <header class="text-center mb-8">
-        <h1 class="text-3xl font-light text-zinc-800">Rivi Silva <span class="font-bold text-gold text-[#D4AF37]">Esmalteria</span></h1>
-        <p class="text-zinc-500 text-sm uppercase tracking-widest mt-2">Escolha seu dia e brilhe</p>
+    <header class="text-center mb-10">
+        <div class="w-24 h-24 rounded-full border-2 border-[#D4AF37] mx-auto mb-4 overflow-hidden bg-zinc-100">
+            <img src="image_5.png" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/150'">
+        </div>
+        <h1 class="text-2xl font-light tracking-[0.3em] uppercase">Rivi Silva <span class="font-bold gold-text">Esmalteria</span></h1>
     </header>
 
-    <main class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8">
+    <main class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-zinc-100">
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="monthName" class="font-bold text-zinc-700 capitalize">Março 2026</h3>
+        <div class="bg-white p-6 rounded-3xl shadow-xl border border-zinc-100">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="monthName" class="font-bold text-lg text-zinc-800 capitalize">Março 2026</h3>
             </div>
             
-            <div class="calendar-grid text-center text-xs font-bold text-zinc-400 mb-2">
+            <div class="calendar-grid text-center text-xs font-bold text-zinc-400 mb-4 uppercase tracking-tighter">
                 <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
             </div>
-            <div id="calendarDays" class="calendar-grid">
-                </div>
+            <div id="calendarDays" class="calendar-grid"></div>
             
-            <div class="mt-4 flex gap-4 text-xs">
-                <div class="flex items-center gap-1"><span class="w-3 h-3 bg-green-100 border border-green-300 rounded"></span> Livre</div>
-                <div class="flex items-center gap-1"><span class="w-3 h-3 bg-red-100 border border-red-300 rounded"></span> Ocupado</div>
+            <div class="mt-6 flex justify-center gap-6 text-xs font-medium">
+                <div class="flex items-center gap-2"><span class="w-4 h-4 day-free rounded-md"></span> Disponível</div>
+                <div class="flex items-center gap-2"><span class="w-4 h-4 day-busy rounded-md"></span> Indisponível</div>
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-zinc-100">
-            <div id="step-info">
-                <p class="text-zinc-400 text-center py-10">Selecione um dia no calendário para ver os horários. ✨</p>
+        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-zinc-100 flex flex-col">
+            <div id="no-date-selected" class="flex-1 flex flex-col items-center justify-center text-zinc-400 space-y-4 py-20">
+                <span class="text-5xl">🗓️</span>
+                <p>Selecione um dia disponível no calendário</p>
             </div>
 
-            <div id="booking-form" class="hidden space-y-4">
-                <h4 class="font-bold text-zinc-700 border-b pb-2">Horários para dia <span id="selected-date-display">--</span></h4>
-                <div id="time-slots" class="grid grid-cols-3 gap-2">
-                    </div>
+            <div id="booking-area" class="hidden space-y-6">
+                <div class="border-b pb-4">
+                    <h4 class="text-zinc-500 text-sm uppercase font-bold tracking-widest">Horários para</h4>
+                    <p id="display-date" class="text-2xl font-bold gold-text">--/--/----</p>
+                </div>
 
-                <div class="pt-4 space-y-3">
-                    <input id="nome" type="text" placeholder="Seu Nome" class="w-full p-3 border rounded-xl outline-none focus:border-gold">
-                    <input id="whatsapp" type="tel" placeholder="Seu WhatsApp" class="w-full p-3 border rounded-xl outline-none focus:border-gold">
+                <div id="time-slots" class="grid grid-cols-3 gap-3"></div>
+
+                <div class="space-y-4 pt-4">
+                    <input id="nome" type="text" placeholder="Seu Nome Completo" class="w-full p-4 bg-zinc-50 border border-zinc-200 rounded-2xl focus:outline-none focus:border-[#D4AF37]">
+                    <input id="whatsapp" type="tel" placeholder="Seu WhatsApp" class="w-full p-4 bg-zinc-50 border border-zinc-200 rounded-2xl focus:outline-none focus:border-[#D4AF37]">
                     
-                    <div class="bg-zinc-50 p-3 rounded-xl border">
-                        <p class="text-xs text-zinc-500 uppercase">Serviços Selecionados:</p>
-                        <p id="totalDisplay" class="font-bold text-gold text-[#D4AF37]">R$ 0,00</p>
+                    <div id="servicos-container" class="space-y-2 max-h-40 overflow-y-auto p-2 border rounded-xl">
+                        </div>
+
+                    <div class="p-4 bg-zinc-900 rounded-2xl flex justify-between items-center">
+                        <span class="text-zinc-400 text-sm">Total Estimado:</span>
+                        <span id="total-price" class="text-white font-bold text-xl">R$ 0,00</span>
                     </div>
 
-                    <button onclick="finalizarAgendamento()" class="w-full bg-[#D4AF37] text-white font-bold py-4 rounded-xl shadow-lg hover:brightness-110 transition">
-                        RESERVAR AGORA ✨
+                    <button id="btn-finalizar" onclick="salvarAgendamento()" class="w-full gold-bg text-white font-bold py-5 rounded-2xl shadow-lg hover:scale-[1.02] transition active:scale-95 uppercase tracking-widest">
+                        Confirmar para às <span id="confirm-time">--:--</span> ✨
                     </button>
                 </div>
             </div>
@@ -77,103 +88,136 @@
         const supabaseKey = 'sb_publishable_wKbs4gYVURdIR6Cafm8qFA_tUZZTIKo'; 
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        let dataSelecionada = null;
+        let diaSelecionado = null;
         let horaSelecionada = null;
-        const horariosPadrao = ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
+        let precoTotal = 0;
+        const horariosTrabalho = ["08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
 
-        async function renderizarCalendario() {
+        // 1. CARREGA CALENDÁRIO
+        async function init() {
             const container = document.getElementById('calendarDays');
             const dataAtual = new Date();
             const ano = dataAtual.getFullYear();
             const mes = dataAtual.getMonth();
 
-            // Pega dias bloqueados do banco
+            // Busca dias bloqueados e meses liberados
             const { data: bloqueios } = await _supabase.from('agenda_bloqueada').select('data_interditada');
-            const diasBloqueados = bloqueios?.map(b => b.data_interditada) || [];
+            const { data: meses } = await _supabase.from('meses_liberados').select('mes_ano, liberado');
 
-            const primeiroDiaMes = new Date(ano, mes, 1).getDay();
-            const totalDiasMes = new Date(ano, mes + 1, 0).getDate();
+            const diasBloqueados = bloqueios?.map(b => b.data_interditada) || [];
+            const mesLiberado = meses?.find(m => m.mes_ano === `${ano}-${String(mes+1).padStart(2, '0')}`)?.liberado;
+
+            const primeiroDia = new Date(ano, mes, 1).getDay();
+            const diasNoMes = new Date(ano, mes + 1, 0).getDate();
 
             container.innerHTML = '';
+            for(let i=0; i<primeiroDia; i++) container.innerHTML += '<div></div>';
 
-            // Espaços vazios
-            for (let i = 0; i < primeiroDiaMes; i++) {
-                container.innerHTML += '<div></div>';
-            }
-
-            // Dias do mês
-            for (let dia = 1; dia <= totalDiasMes; dia++) {
-                const dataString = `${ano}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-                const isBloqueado = diasBloqueados.includes(dataString);
-                const isPassado = new Date(dataString) < new Date().setHours(0,0,0,0);
+            for(let dia=1; dia<=diasNoMes; dia++) {
+                const dataFormatada = `${ano}-${String(mes+1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+                const isPassado = new Date(dataFormatada) < new Date().setHours(0,0,0,0);
+                const isBlocked = diasBloqueados.includes(dataFormatada) || !mesLiberado;
                 
-                const classeCor = (isBloqueado || isPassado) ? 'day-busy' : 'day-free';
+                const diaDiv = document.createElement('div');
+                diaDiv.className = `day-box ${ (isBlocked || isPassado) ? 'day-busy' : 'day-free' }`;
+                diaDiv.innerHTML = `<span class="text-xs font-bold">${dia}</span>`;
                 
-                const diaElement = document.createElement('div');
-                diaElement.className = `day-box ${classeCor}`;
-                diaElement.innerText = dia;
-                if (!isBloqueado && !isPassado) {
-                    diaElement.onclick = () => selecionarDia(diaElement, dataString);
+                if(!isBlocked && !isPassado) {
+                    diaDiv.onclick = () => selecionarDia(diaDiv, dataFormatada);
                 }
-                container.appendChild(diaElement);
+                container.appendChild(diaDiv);
             }
+            carregarServicos();
         }
 
-        async function selecionarDia(elemento, dataStr) {
+        // 2. SELECIONA DIA E BUSCA HORÁRIOS OCUPADOS
+        async function selecionarDia(el, data) {
             document.querySelectorAll('.day-box').forEach(d => d.classList.remove('day-selected'));
-            elemento.classList.add('day-selected');
+            el.classList.add('day-selected');
             
-            dataSelecionada = dataStr;
-            document.getElementById('selected-date-display').innerText = dataStr.split('-').reverse().join('/');
-            document.getElementById('step-info').classList.add('hidden');
-            document.getElementById('booking-form').classList.remove('hidden');
+            diaSelecionado = data;
+            document.getElementById('no-date-selected').classList.add('hidden');
+            document.getElementById('booking-area').classList.remove('hidden');
+            document.getElementById('display-date').innerText = data.split('-').reverse().join('/');
+            
+            // Busca o que já tá agendado nesse dia no Supabase
+            const { data: agendados } = await _supabase.from('agendamentos').select('horario_agendado').eq('data_agendada', data);
+            const ocupados = agendados?.map(a => a.horario_agendado.substring(0, 5)) || [];
 
-            // Busca horários já ocupados no banco para esse dia
-            const { data: ocupados } = await _supabase.from('agendamentos').select('horario_agendado').eq('data_agendada', dataStr);
-            const listaOcupados = ocupados?.map(o => o.horario_agendado.substring(0, 5)) || [];
+            const slotsContainer = document.getElementById('time-slots');
+            slotsContainer.innerHTML = '';
 
-            const timeContainer = document.getElementById('time-slots');
-            timeContainer.innerHTML = '';
-
-            horariosPadrao.forEach(hora => {
-                const isOcupado = listaOcupados.includes(hora);
-                const slot = document.createElement('div');
-                slot.className = `time-slot ${isOcupado ? 'bg-zinc-100 text-zinc-300 cursor-not-allowed opacity-50' : ''}`;
-                slot.innerText = hora;
-                if (!isOcupado) {
-                    slot.onclick = () => {
+            horariosTrabalho.forEach(hora => {
+                const isOcupado = ocupados.includes(hora);
+                const btn = document.createElement('div');
+                btn.className = `time-slot ${isOcupado ? 'occupied' : ''}`;
+                btn.innerText = hora;
+                if(!isOcupado) {
+                    btn.onclick = () => {
                         document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('time-selected'));
-                        slot.classList.add('time-selected');
+                        btn.classList.add('time-selected');
                         horaSelecionada = hora;
+                        document.getElementById('confirm-time').innerText = hora;
                     };
                 }
-                timeContainer.appendChild(slot);
+                slotsContainer.appendChild(btn);
             });
         }
 
-        async function finalizarAgendamento() {
-            const nome = document.getElementById('nome').value;
-            const whatsapp = document.getElementById('whatsapp').value;
-
-            if (!nome || !whatsapp || !horaSelecionada) {
-                return alert("Preencha seu nome, zap e escolha o horário! 💅");
+        // 3. CARREGA SERVIÇOS DO BANCO
+        async function carregarServicos() {
+            const container = document.getElementById('servicos-container');
+            const { data } = await _supabase.from('servicos').select('*').order('nome');
+            if(data) {
+                container.innerHTML = data.map(s => `
+                    <label class="flex justify-between items-center p-2 hover:bg-zinc-50 rounded-lg cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" value="${s.id}" data-price="${s.preco}" onchange="calcularTotal()" class="w-5 h-5 accent-[#D4AF37]">
+                            <span class="text-sm">${s.nome}</span>
+                        </div>
+                        <span class="text-xs font-bold text-zinc-400">R$ ${s.preco}</span>
+                    </label>
+                `).join('');
             }
+        }
+
+        function calcularTotal() {
+            precoTotal = 0;
+            const checks = document.querySelectorAll('input[type="checkbox"]:checked');
+            checks.forEach(c => precoTotal += parseFloat(c.dataset.price));
+            document.getElementById('total-price').innerText = `R$ ${precoTotal.toFixed(2).replace('.', ',')}`;
+        }
+
+        // 4. SALVA TUDO
+        async function salvarAgendamento() {
+            const nome = document.getElementById('nome').value;
+            const zap = document.getElementById('whatsapp').value;
+            const servicos = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
+
+            if(!nome || !zap || !horaSelecionada || servicos.length === 0) {
+                return alert("Preenche tudo, gata! Nome, zap, serviço e o horário. 💅");
+            }
+
+            document.getElementById('btn-finalizar').innerText = "PROCESSANDO... ✨";
 
             const { error } = await _supabase.from('agendamentos').insert([{
                 cliente_nome: nome,
-                cliente_whatsapp: whatsapp,
-                data_agendada: dataSelecionada,
+                cliente_whatsapp: zap,
+                data_agendada: diaSelecionado,
                 horario_agendado: horaSelecionada,
-                servico_id: '8665f826-6d65-4f6c-8e6d-616c61636163' // Exemplo: ID fixo ou pegue do select anterior
+                servico_id: servicos[0] // Salvando o principal
             }]);
 
-            if (error) return alert("Erro ao agendar: " + error.message);
-
-            alert("Agendado com sucesso! Te esperamos. ✨");
-            location.reload();
+            if(error) {
+                alert("Erro: " + error.message);
+                document.getElementById('btn-finalizar').innerText = "Confirmar Agendamento";
+            } else {
+                alert("AGENDADO! Prepara o look que a Rivi te espera! 💖✨");
+                location.reload();
+            }
         }
 
-        renderizarCalendario();
+        init();
     </script>
 </body>
 </html>
