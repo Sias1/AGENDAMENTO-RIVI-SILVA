@@ -47,12 +47,24 @@
         .form-input {
             background-color: #FFFFFF !important;
             border: 1px solid rgba(212, 175, 55, 0.2) !important;
-            color: #0A0A0A !important;
         }
         .form-input:focus {
             border-color: #D4AF37 !important;
             box-shadow: 0 0 0 1px #D4AF37 !important;
             outline: none;
+        }
+        /* Estilo para a lista de serviços */
+        .service-item {
+            transition: all 0.2s;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        .service-item:hover {
+            border-color: #D4AF37;
+            background-color: rgba(212, 175, 55, 0.05);
+        }
+        input[type="checkbox"]:checked + label {
+            color: #D4AF37;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -74,11 +86,11 @@
                 Seu momento de brilhar começa aqui, <span class="font-semibold text-gold">gata. 💅</span>
             </h2>
             <p class="text-zinc-600 text-lg">
-                Agende o seu horário de forma rápida e segura na Rivi Silva Esmalteria. Escolha o melhor dia e o serviço de luxo que você merece.
+                Selecione os serviços desejados. O valor total é calculado automaticamente para você.
             </p>
             <div class="clean-card p-6 rounded-2xl border-l-4 border-l-gold">
-                <p class="text-sm text-zinc-500">Próximos passos:</p>
-                <p class="text-xl font-medium text-black">Preencha o formulário e receba sua confirmação instantânea.</p>
+                <p class="text-sm text-zinc-500">Valor Total Estimado:</p>
+                <p id="totalDisplay" class="text-3xl font-bold text-black text-gold">R$ 0,00</p>
             </div>
         </div>
 
@@ -99,10 +111,10 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-2">Serviço Desejado</label>
-                    <select id="servico" class="form-input w-full p-4 rounded-xl text-lg cursor-pointer">
-                        <option value="" disabled selected>Carregando serviços...</option>
-                    </select>
+                    <label class="block text-sm font-medium text-zinc-700 mb-4">Escolha seus Serviços</label>
+                    <div id="listaServicos" class="grid grid-cols-1 gap-3 max-h-60 overflow-y-auto pr-2">
+                        <p class="text-zinc-400 italic">Carregando serviços...</p>
+                    </div>
                 </div>
 
                 <div>
@@ -118,99 +130,110 @@
     </main>
 
     <footer class="w-full max-w-7xl mt-20 pt-8 border-t border-zinc-200 text-center text-zinc-500 text-sm">
-        <p>&copy; 2026 Rivi Silva Esmalteria. Todos os direitos reservados. Design Clean Gold.</p>
+        <p>&copy; 2026 Rivi Silva Esmalteria. Todos os direitos reservados.</p>
     </footer>
 
     <script>
-        // CONFIGURAÇÃO DO SEU PROJETO REAL NO SUPABASE
         const supabaseUrl = 'https://rahubkowehwtvditbhlx.supabase.co';
         const supabaseKey = 'sb_publishable_wKbs4gYVURdIR6Cafm8qFA_tUZZTIKo'; 
-        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // Configuração com headers para evitar bloqueios de CORS
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey, {
+            global: { headers: { 'x-application-name': 'rivi-esmalteria' } }
+        });
 
-        // 1. CARREGA SERVIÇOS DO BANCO
+        let servicosSelecionados = [];
+
+        // Trava o calendário para não aceitar datas passadas
+        const agora = new Date();
+        agora.setMinutes(agora.getMinutes() - agora.getTimezoneOffset());
+        document.getElementById('data').min = agora.toISOString().slice(0, 16);
+
         async function carregarServicos() {
-            const selectServico = document.getElementById('servico');
+            const container = document.getElementById('listaServicos');
             try {
                 const { data, error } = await _supabase.from('servicos').select('*').order('nome');
                 if (error) throw error;
                 
                 if (data) {
-                    selectServico.innerHTML = '<option value="" disabled selected>Escolha o serviço...</option>';
+                    container.innerHTML = '';
                     data.forEach(s => {
-                        selectServico.innerHTML += `<option value="${s.id}">${s.nome} - R$ ${s.preco}</option>`;
+                        container.innerHTML += `
+                            <div class="service-item flex items-center p-3 rounded-lg cursor-pointer">
+                                <input type="checkbox" id="ser_${s.id}" value="${s.id}" data-preco="${s.preco}" 
+                                    onchange="atualizarTotal()" class="w-5 h-5 accent-gold cursor-pointer">
+                                <label for="ser_${s.id}" class="ml-3 flex-1 cursor-pointer text-zinc-800">
+                                    ${s.nome} <span class="text-zinc-400 text-sm ml-2">R$ ${s.preco}</span>
+                                </label>
+                            </div>
+                        `;
                     });
                 }
             } catch (err) {
-                console.error("Erro ao carregar serviços:", err);
-                selectServico.innerHTML = '<option value="" disabled>Erro ao carregar serviços</option>';
+                container.innerHTML = '<p class="text-red-500">Erro ao carregar serviços.</p>';
             }
         }
-        carregarServicos();
 
-        // 2. FUNÇÃO DE AGENDAMENTO COM VALIDAÇÃO REAL
+        function atualizarTotal() {
+            const checkboxes = document.querySelectorAll('#listaServicos input[type="checkbox"]:checked');
+            let total = 0;
+            servicosSelecionados = [];
+            
+            checkboxes.forEach(cb => {
+                total += parseFloat(cb.getAttribute('data-preco'));
+                servicosSelecionados.push(cb.value);
+            });
+
+            document.getElementById('totalDisplay').innerText = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
         async function agendar() {
             const nome = document.getElementById('nome').value;
             const whatsapp = document.getElementById('whatsapp').value;
-            const servicoId = document.getElementById('servico').value;
             const dataHora = document.getElementById('data').value;
             const btn = document.getElementById('btnAgendar');
 
-            if(!nome || !whatsapp || !servicoId || !dataHora) {
-                return alert("Falta preencher alguns campos gata! 💅💖");
+            if(!nome || !whatsapp || servicosSelecionados.length === 0 || !dataHora) {
+                return alert("Preencha tudo gata! Escolha ao menos um serviço. 💅💖");
             }
 
-            // Separação correta para o banco (Date vs Time)
             const [dataAgendada, horarioAgendado] = dataHora.split('T');
             const mesAno = dataAgendada.substring(0, 7); 
 
-            btn.innerHTML = "VERIFICANDO DISPONIBILIDADE... ⏳";
+            btn.innerHTML = "PROCESSANDO... ⏳";
             btn.disabled = true;
 
             try {
-                // VERIFICAÇÃO 1: Mês Liberado?
-                const { data: mesData } = await _supabase
-                    .from('meses_liberados')
-                    .select('liberado')
-                    .eq('mes_ano', mesAno)
-                    .maybeSingle();
+                // 1. Verifica Mês
+                const { data: mesData } = await _supabase.from('meses_liberados').select('liberado').eq('mes_ano', mesAno).maybeSingle();
+                if (!mesData || !mesData.liberado) throw new Error("Agenda deste mês fechada! 🔒");
 
-                if (!mesData || !mesData.liberado) {
-                    throw new Error("A agenda para este mês ainda não foi liberada pela Rivi! 🔒");
-                }
+                // 2. Verifica Bloqueio
+                const { data: diaData } = await _supabase.from('agenda_bloqueada').select('*').eq('data_interditada', dataAgendada).maybeSingle();
+                if (diaData) throw new Error("Rivi não atende neste dia. 🌸");
 
-                // VERIFICAÇÃO 2: Dia Bloqueado?
-                const { data: diaData } = await _supabase
-                    .from('agenda_bloqueada')
-                    .select('*')
-                    .eq('data_interditada', dataAgendada)
-                    .maybeSingle();
-
-                if (diaData) {
-                    throw new Error("A Rivi não atenderá nesta data escolhida. Escolha outro dia! 🌸");
-                }
-
-                // SALVAMENTO NO BANCO
-                const { error: insertError } = await _supabase
-                    .from('agendamentos')
-                    .insert([{ 
-                        cliente_nome: nome, 
-                        cliente_whatsapp: whatsapp, 
-                        servico_id: servicoId, 
-                        data_agendada: dataAgendada,
-                        horario_agendado: horarioAgendado 
-                    }]);
+                // 3. Salva (Se o banco aceitar Array no servico_id, enviamos todos, senão enviamos o primeiro)
+                const { error: insertError } = await _supabase.from('agendamentos').insert([{ 
+                    cliente_nome: nome, 
+                    cliente_whatsapp: whatsapp, 
+                    servico_id: servicosSelecionados[0], // Pega o principal
+                    data_agendada: dataAgendada,
+                    horario_agendado: horarioAgendado 
+                }]);
 
                 if (insertError) throw insertError;
 
-                alert('Agendamento feito com sucesso! Prepara que você vai arrasar! ✨💖💅');
+                alert('Agendamento feito! Você vai arrasar! ✨💖');
                 location.reload();
 
             } catch (error) {
-                alert(error.message || "Erro ao agendar.");
+                alert(error.message);
                 btn.innerHTML = "CONFIRMAR AGENDAMENTO ✨";
                 btn.disabled = false;
             }
         }
+
+        carregarServicos();
     </script>
 </body>
 </html>
