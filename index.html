@@ -18,10 +18,10 @@
         .day-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; transition: 0.2s; border: 1px solid #eee; font-size: 0.85rem; font-weight: 600; }
         .day-free { background: #f0fdf4; color: #166534; border-color: #bbf7d0; } 
         .day-busy { background: #fef2f2; color: #991b1b; border-color: #fecaca; cursor: not-allowed; opacity: 0.5; }
-        .day-selected { background: #D4AF37 !important; color: white !important; border-color: #B8860B !important; transform: scale(1.05); }
+        .day-selected { background: #D4AF37 !important; color: white !important; border-color: #D4AF37 !important; }
         .time-slot { padding: 10px; border: 1px solid #eee; border-radius: 10px; text-align: center; cursor: pointer; font-size: 0.85rem; background: white; transition: 0.2s; }
         .time-selected { background: #D4AF37; color: white; border-color: #D4AF37; }
-        .occupied { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; text-decoration: line-through; border: 1px dashed #d1d5db; }
+        .occupied { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; text-decoration: line-through; }
         .contact-icon { color: #D4AF37; transition: transform 0.3s ease; }
         .contact-icon:hover { transform: scale(1.1); color: #B8860B; }
     </style>
@@ -30,9 +30,9 @@
 
     <div class="mb-8 flex flex-col items-center gap-4">
         <img src="logo.png" alt="Rivi Silva Esmalteria" class="h-24 md:h-32 object-contain">
-        
-        <div class="flex gap-6 items-center">
-            <a href="https://www.instagram.com/esmalteria_rivi?igsh=MWx2dzNxenRmYzF0bQ==" target="_blank" class="contact-icon">
+        <p class="text-[10px] gold-text font-bold uppercase tracking-[0.4em]">Design de Luxo</p>
+        <div class="flex gap-6 items-center pt-2">
+            <a href="https://www.instagram.com/esmalteria_rivi" target="_blank" class="contact-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
             </a>
             <a href="https://wa.me/5571992447638" target="_blank" class="contact-icon">
@@ -56,54 +56,30 @@
             <h3 class="text-xl font-semibold text-gold text-center uppercase tracking-widest mb-6">Solicitar Agendamento</h3>
 
             <div class="space-y-4">
-                <input id="nome" type="text" placeholder="Seu Nome Completo" class="form-input w-full p-4 rounded-xl uppercase">
-                <input id="whatsapp" type="tel" placeholder="Seu WhatsApp" class="form-input w-full p-4 rounded-xl">
+                <input id="nome" type="text" placeholder="Seu Nome Completo" class="form-input w-full p-4 rounded-xl uppercase text-xs font-bold bg-zinc-50">
+                <input id="whatsapp_input" type="tel" maxlength="15" oninput="this.value = phoneMask(this.value)" placeholder="(71) 00000-0000" class="form-input w-full p-4 rounded-xl text-xs font-bold bg-zinc-50">
             </div>
 
             <div>
                 <label class="block text-xs font-bold text-zinc-400 uppercase mb-2">Serviços</label>
-                <div id="listaServicos" class="grid grid-cols-1 gap-1 max-h-40 overflow-y-auto border rounded-xl p-2 bg-white"></div>
-                <div class="mt-3 p-4 bg-zinc-900 rounded-xl flex justify-between items-center text-white">
-                    <span class="text-zinc-400">Total Previsto:</span>
+                <div id="listaServicos" class="grid grid-cols-1 gap-1 max-h-40 overflow-y-auto border border-zinc-100 rounded-xl p-2 bg-white text-[10px]"></div>
+                <div class="mt-3 p-4 bg-zinc-900 rounded-xl flex justify-between items-center text-white shadow-xl">
+                    <span class="text-zinc-400 font-bold text-xs uppercase">Total:</span>
                     <span id="totalDisplay" class="text-2xl font-bold gold-text">R$ 0,00</span>
                 </div>
             </div>
 
             <div class="pt-4 border-t">
-                <label class="block text-xs font-bold text-zinc-400 uppercase mb-3 text-center">Escolha o Dia</label>
+                <label class="block text-xs font-bold text-zinc-400 uppercase mb-3 text-center tracking-widest">Escolha a Data</label>
                 <div id="calendarDays" class="calendar-grid"></div>
             </div>
 
-            <div id="section-horarios" class="hidden space-y-4 pt-4 border-t">
-                <label class="block text-xs font-bold text-zinc-400 uppercase text-center">Horários para <span id="display-date" class="gold-text">--/--</span></label>
+            <div id="section-horarios" class="hidden space-y-4 pt-4 border-t border-zinc-100">
+                <label class="block text-xs font-bold text-zinc-400 uppercase text-center tracking-widest">Horários para <span id="display-date" class="gold-text">--/--</span></label>
                 <div id="time-slots" class="grid grid-cols-3 gap-2 pb-4"></div>
                 
-                <div class="p-5 bg-zinc-50 rounded-2xl border border-dashed border-gold/40 space-y-4 text-center">
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="text-left">
-                            <p class="text-[10px] text-zinc-400 font-bold uppercase">Sinal de Reserva (Fixo)</p>
-                            <p class="text-lg font-black gold-text">R$ 50,00</p>
-                        </div>
-                        <img src="logo_pix.png" alt="PIX" class="h-4 opacity-50">
-                    </div>
-
-                    <div class="bg-white p-3 rounded-lg border border-gray-100">
-                        <p class="text-[9px] text-zinc-400 font-bold uppercase mb-1">Chave CPF • Mercado Pago</p>
-                        <p class="text-sm font-bold text-zinc-800 tracking-tight">71 99244-7638</p>
-                        <p class="text-[9px] text-zinc-500 font-medium">Favorecido: Rivelino Araújo</p>
-                    </div>
-
-                    <div class="py-2">
-                        <p class="text-[10px] text-zinc-600 font-bold uppercase leading-tight italic">
-                            Agendamento concluído assim que enviar o comprovante no WhatsApp! ✨
-                        </p>
-                        <p class="text-[9px] text-zinc-400 mt-1">Você receberá uma mensagem de confirmação em seguida.</p>
-                    </div>
-                </div>
-                
-                <button id="btnAgendar" onclick="finalizarAgendamento()" class="w-full gold-bg text-white font-bold py-5 rounded-xl shadow-lg uppercase tracking-widest mt-4 hover:scale-[1.02] transition-transform flex items-center justify-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-whatsapp"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                    CONFIRMAR E ENVIAR COMPROVANTE 💅
+                <button id="btnAgendar" onclick="finalizarAgendamento()" class="w-full gold-bg text-zinc-900 font-black py-5 rounded-xl shadow-lg uppercase text-[11px] tracking-widest active:scale-95 transition-all">
+                    Confirmar Agendamento 💅
                 </button>
             </div>
         </div>
@@ -116,45 +92,75 @@
 
         let dataSelecionada = null;
         let horaSelecionada = null;
-        let configAgenda = { inicio: '09:00', fim: '18:00', intervalo: 40 };
+        let configPadrao = { inicio: '09:00', fim: '18:00', intervalo: 40 };
+        let bloqueios = [];
+        let excecoes = {};
+
+        function phoneMask(v) {
+            v = v.replace(/\D/g, "");
+            if (v.length > 11) v = v.substring(0, 11);
+            v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
+            v = v.replace(/(\d)(\d{4})$/, "$1-$2");
+            return v;
+        }
 
         async function init() {
             const container = document.getElementById('calendarDays');
             const hoje = new Date();
-            const hojeDataApenas = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-            const mesAnoKey = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;
+            const diaHoje = hoje.getDate();
+            const mesHoje = hoje.getMonth();
+            const anoHoje = hoje.getFullYear();
+            const mesAnoKey = `${anoHoje}-${String(mesHoje + 1).padStart(2, '0')}`;
 
-            const [resConfig, resMeses, resBloqueios] = await Promise.all([
+            const [resConfig, resBloqueios, resExcecoes, resMeses] = await Promise.all([
                 _supabase.from('agenda_config').select('*').eq('id', 1).single(),
-                _supabase.from('meses_liberados').select('liberado').eq('mes_ano', mesAnoKey).single(),
-                _supabase.from('agenda_bloqueada').select('data_interditada')
+                _supabase.from('agenda_bloqueada').select('data_interditada'),
+                _supabase.from('agenda_excecoes').select('*'),
+                _supabase.from('meses_liberados').select('liberado').eq('mes_ano', mesAnoKey).single()
             ]);
 
-            if (resConfig.data) configAgenda = { inicio: resConfig.data.hora_inicio, fim: resConfig.data.hora_fim, intervalo: resConfig.data.intervalo_minutos };
-
-            if (!resMeses.data || !resMeses.data.liberado) {
-                container.innerHTML = `<p class="col-span-7 text-center text-xs text-zinc-400 py-4 italic">Agenda fechada pela Rivi. 🔒</p>`;
-                return;
+            if (resConfig.data) configPadrao = { inicio: resConfig.data.hora_inicio, fim: resConfig.data.hora_fim, intervalo: resConfig.data.intervalo_minutos };
+            if (resBloqueios.data) bloqueios = resBloqueios.data.map(b => b.data_interditada);
+            
+            // ✅ CARREGA A TABELA CORRETA DO SEU PAINEL
+            if (resExcecoes.data) {
+                resExcecoes.data.forEach(ex => {
+                    excecoes[ex.data] = { inicio: ex.hora_inicio, fim: ex.hora_fim };
+                });
             }
 
-            const listaBloqueados = resBloqueios.data?.map(b => b.data_interditada) || [];
+            if (!resMeses.data || !resMeses.data.liberado) {
+                container.innerHTML = `<p class="col-span-7 text-center py-10 text-xs font-bold text-zinc-400 uppercase">Agenda indisponível para este mês.</p>`;
+            } else {
+                renderCalendar(hoje);
+            }
+            carregarServicos();
+        }
+
+        function renderCalendar(hoje) {
+            const container = document.getElementById('calendarDays');
             const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1).getDay();
-            const totalDias = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
+            const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
+            const diaAtual = hoje.getDate();
 
             container.innerHTML = '';
             for(let i=0; i<primeiroDia; i++) container.innerHTML += '<div></div>';
 
-            for(let d=1; d<=totalDias; d++) {
-                const dataStr = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                const isPast = new Date(hoje.getFullYear(), hoje.getMonth(), d) < hojeDataApenas;
-                const isBlocked = listaBloqueados.includes(dataStr);
+            for(let d=1; d<=ultimoDia; d++) {
+                const dataStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const isBlocked = bloqueios.includes(dataStr);
+                const isPassado = d < diaAtual;
+
                 const box = document.createElement('div');
-                box.className = `day-box ${ (isPast || isBlocked) ? 'day-busy' : 'day-free' }`;
+                // Visual padrão (Verde livre, Vermelho bloqueado)
+                box.className = `day-box ${isPassado || isBlocked ? 'day-busy' : 'day-free'}`;
                 box.innerText = d;
-                if(!isPast && !isBlocked) box.onclick = () => carregarHorarios(box, dataStr);
+                
+                if(!isPassado && !isBlocked) {
+                    box.onclick = () => carregarHorarios(box, dataStr);
+                }
                 container.appendChild(box);
             }
-            carregarServicos();
         }
 
         async function carregarHorarios(el, data) {
@@ -162,56 +168,59 @@
             el.classList.add('day-selected');
             dataSelecionada = data;
             horaSelecionada = null;
+
             document.getElementById('section-horarios').classList.remove('hidden');
             document.getElementById('display-date').innerText = data.split('-').reverse().join('/');
 
-            const { data: ocupados } = await _supabase.from('agendamentos')
-                .select('horario')
-                .eq('data_atendimento', data)
-                .not('status', 'eq', 'Cancelado');
-
-            const listaOcupados = ocupados?.map(o => o.horario.substring(0, 5)) || [];
-            const slots = gerarSlots(configAgenda.inicio, configAgenda.fim, configAgenda.intervalo);
+            const { data: ocupados } = await _supabase.from('agendamentos').select('horario').eq('data_atendimento', data).not('status', 'eq', 'Cancelado');
+            const ocupadosList = ocupados?.map(o => o.horario.substring(0, 5)) || [];
+            
+            // ✅ USA HORÁRIO ESPECIAL DO PAINEL SE EXISTIR
+            const hI = excecoes[data] ? excecoes[data].inicio : configPadrao.inicio;
+            const hF = excecoes[data] ? excecoes[data].fim : configPadrao.fim;
 
             const slotsDiv = document.getElementById('time-slots');
             slotsDiv.innerHTML = ''; 
-            
-            const agora = new Date();
-            const hojeFormatado = `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`;
-            const horaAtualStr = `${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}`;
 
-            slots.forEach(h => {
-                const isOcupado = listaOcupados.includes(h);
-                const jaPassou = (data === hojeFormatado && h <= horaAtualStr);
+            let [h, m] = hI.split(':').map(Number);
+            let [fimH, fimM] = hF.split(':').map(Number);
+            let totalMin = (h * 60) + m;
+            const totalFim = (fimH * 60) + fimM;
+
+            const agora = new Date();
+            const dataHojeStr = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`;
+            const agoraMin = (agora.getHours() * 60) + agora.getMinutes();
+
+            while (totalMin < totalFim) {
+                const hFormat = `${String(Math.floor(totalMin / 60)).padStart(2, '0')}:${String(totalMin % 60).padStart(2, '0')}`;
+                const isOcupado = ocupadosList.includes(hFormat);
+                const isPassado = (data === dataHojeStr && totalMin <= (agoraMin + 20));
+
                 const btn = document.createElement('div');
-                btn.className = `time-slot ${ (isOcupado || jaPassou) ? 'occupied' : 'hover:border-gold'}`;
-                btn.innerText = h;
-                if(!isOcupado && !jaPassou) {
+                btn.className = `time-slot ${ (isOcupado || isPassado) ? 'occupied' : 'hover:gold-text hover:border-gold'}`;
+                btn.innerText = hFormat;
+
+                if (!isOcupado && !isPassado) {
                     btn.onclick = () => {
                         document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('time-selected'));
                         btn.classList.add('time-selected');
-                        horaSelecionada = h;
+                        horaSelecionada = hFormat;
                     };
                 }
                 slotsDiv.appendChild(btn);
-            });
-        }
-
-        function gerarSlots(i, f, int) {
-            const s = []; let a = new Date(`2026-01-01T${i}:00`); const l = new Date(`2026-01-01T${f}:00`);
-            while(a < l) { s.push(a.toTimeString().substring(0, 5)); a.setMinutes(a.getMinutes() + int); }
-            return s;
+                totalMin += parseInt(configPadrao.intervalo);
+            }
         }
 
         async function carregarServicos() {
             const { data } = await _supabase.from('servicos').select('*').order('nome');
             if(data) document.getElementById('listaServicos').innerHTML = data.map(s => `
-                <label class="flex justify-between items-center p-3 hover:bg-zinc-50 cursor-pointer">
+                <label class="flex justify-between items-center p-3 hover:bg-zinc-50 cursor-pointer border-b last:border-0 border-zinc-100">
                     <div class="flex items-center gap-3">
                         <input type="checkbox" value="${s.nome}" data-price="${s.preco}" onchange="calcTotal()" class="accent-gold w-4 h-4">
-                        <span class="text-[10px] font-bold text-zinc-700 uppercase">${s.nome}</span>
+                        <span class="font-bold text-zinc-800 uppercase tracking-tighter">${s.nome}</span>
                     </div>
-                    <span class="text-zinc-400 text-[10px] font-bold">R$ ${s.preco}</span>
+                    <span class="text-zinc-400 font-bold">R$ ${s.preco}</span>
                 </label>`).join('');
         }
 
@@ -222,15 +231,12 @@
 
         async function finalizarAgendamento() {
             const n = document.getElementById('nome').value;
-            const z = document.getElementById('whatsapp').value;
+            const z = document.getElementById('whatsapp_input').value; 
             const svs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
 
-            if(!n || !z || !dataSelecionada || !horaSelecionada || svs.length === 0) {
-                return alert("Preencha todos os campos e escolha seu horário, gata! 💅");
+            if(!n || z.length < 14 || !dataSelecionada || !horaSelecionada || svs.length === 0) {
+                return alert("Falta preencher algo, gata! 💅");
             }
-
-            document.getElementById('btnAgendar').innerText = "CONFIRMANDO... ✨";
-            document.getElementById('btnAgendar').disabled = true;
 
             const { error } = await _supabase.from('agendamentos').insert([{
                 cliente_nome: n.toUpperCase(), telefone: z, data_atendimento: dataSelecionada,
@@ -238,14 +244,10 @@
                 valor: parseFloat(document.getElementById('totalDisplay').innerText.replace('R$ ', '').replace(',', '.'))
             }]);
 
-            if(error) { 
-                alert("Erro ao salvar: " + error.message); 
-                document.getElementById('btnAgendar').innerText = "CONFIRMAR E ENVIAR COMPROVANTE 💅";
-                document.getElementById('btnAgendar').disabled = false;
-            } 
-            else {
-                const msg = `Oi Rivi! Sou a ${n.toUpperCase()}. Agendei ${svs.join(", ")} para o dia ${dataSelecionada.split('-').reverse().join('/')} às ${horaSelecionada}. O comprovante de R$ 50,00 está pronto! 💖💅`;
-                alert("Horário reservado! Envie o comprovante no WhatsApp agora para confirmar.");
+            if(!error) {
+                // ✅ MENSAGEM DO WHATSAPP ATUALIZADA COM A COBRANÇA DO SINAL
+                const msg = `Agendamento Rivi Silva 💅\n\nNome: ${n.toUpperCase()}\nData: ${dataSelecionada.split('-').reverse().join('/')}\nHora: ${horaSelecionada}\nServiços: ${svs.join(", ")}\n\nsegue o meu comprovante com o sinal para garantir o meu agendamento!`;
+                
                 window.open(`https://wa.me/5571992447638?text=${encodeURIComponent(msg)}`, '_blank');
                 location.reload();
             }
