@@ -22,12 +22,17 @@
         .time-slot { padding: 10px; border: 1px solid #eee; border-radius: 10px; text-align: center; cursor: pointer; font-size: 0.85rem; background: white; transition: 0.2s; }
         .time-selected { background: #D4AF37; color: white; border-color: #D4AF37; }
         .occupied { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; text-decoration: line-through; border: 1px dashed #d1d5db; }
+        .insta-icon { color: #D4AF37; transition: transform 0.3s ease; }
+        .insta-icon:hover { transform: scale(1.1); }
     </style>
 </head>
 <body class="p-4 md:p-8 flex flex-col items-center min-h-screen">
 
-    <div class="mb-8">
+    <div class="mb-8 flex flex-col items-center gap-4">
         <img src="logo.png" alt="Rivi Silva Esmalteria" class="h-24 md:h-32 object-contain">
+        <a href="https://www.instagram.com/esmalteria_rivi?igsh=MWx2dzNxenRmYzF0bQ==" target="_blank" class="insta-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+        </a>
     </div>
 
     <main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -42,7 +47,7 @@
             <h3 class="text-xl font-semibold text-gold text-center uppercase tracking-widest mb-6">Solicitar Agendamento</h3>
 
             <div class="space-y-4">
-                <input id="nome" type="text" placeholder="Seu Nome Completo" class="form-input w-full p-4 rounded-xl">
+                <input id="nome" type="text" placeholder="Seu Nome Completo" class="form-input w-full p-4 rounded-xl uppercase">
                 <input id="whatsapp" type="tel" placeholder="WhatsApp" class="form-input w-full p-4 rounded-xl">
             </div>
 
@@ -50,7 +55,7 @@
                 <label class="block text-xs font-bold text-zinc-400 uppercase mb-2">Serviços</label>
                 <div id="listaServicos" class="grid grid-cols-1 gap-1 max-h-40 overflow-y-auto border rounded-xl p-2 bg-white"></div>
                 <div class="mt-3 p-4 bg-zinc-900 rounded-xl flex justify-between items-center text-white">
-                    <span class="text-zinc-400">Total:</span>
+                    <span class="text-zinc-400">Total Estimado:</span>
                     <span id="totalDisplay" class="text-2xl font-bold gold-text">R$ 0,00</span>
                 </div>
             </div>
@@ -62,10 +67,31 @@
 
             <div id="section-horarios" class="hidden space-y-4 pt-4 border-t">
                 <label class="block text-xs font-bold text-zinc-400 uppercase text-center">Horários para <span id="display-date" class="gold-text">--/--</span></label>
-                <div id="time-slots" class="grid grid-cols-3 gap-2"></div>
+                <div id="time-slots" class="grid grid-cols-3 gap-2 pb-4"></div>
                 
-                <button id="btnAgendar" onclick="finalizarAgendamento()" class="w-full gold-bg text-white font-bold py-5 rounded-xl shadow-lg uppercase tracking-widest mt-4">
-                    CONFIRMAR AGENDAMENTO ✨
+                <div class="p-5 bg-zinc-50 rounded-2xl border border-dashed border-gold/40 space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-[10px] text-zinc-400 font-bold uppercase">Sinal Obrigatório (Reserva)</p>
+                            <p id="sinalDisplay" class="text-lg font-black gold-text">R$ 50,00</p>
+                        </div>
+                        <img src="logo_pix.png" alt="PIX" class="h-4 opacity-50">
+                    </div>
+
+                    <div class="bg-white p-3 rounded-lg border border-gray-100">
+                        <p class="text-[9px] text-zinc-400 font-bold uppercase mb-1">Chave TELEFONE • Mercado Pago</p>
+                        <p class="text-sm font-bold text-zinc-800 tracking-tight">71 99244-7638</p>
+                        <p class="text-[9px] text-zinc-500 font-medium text-[8px]">Favorecido: Rivelino Araújo</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Anexar Comprovante do Sinal</label>
+                        <input type="file" id="comprovante" class="text-[10px] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-gold/10 file:text-gold hover:file:bg-gold/20 w-full">
+                    </div>
+                </div>
+                
+                <button id="btnAgendar" onclick="finalizarAgendamento()" class="w-full gold-bg text-white font-bold py-5 rounded-xl shadow-lg uppercase tracking-widest mt-4 hover:scale-[1.02] transition-transform">
+                    CONFIRMAR AGENDAMENTO 💅
                 </button>
             </div>
         </div>
@@ -79,7 +105,6 @@
         let dataSelecionada = null;
         let horaSelecionada = null;
         let configAgenda = { inicio: '09:00', fim: '18:00', intervalo: 40 };
-        let excecoesHorarios = {}; // Armazena as exceções carregadas
 
         async function init() {
             const container = document.getElementById('calendarDays');
@@ -87,30 +112,16 @@
             const hojeDataApenas = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
             const mesAnoKey = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;
 
-            const [resConfig, resMeses, resBloqueios, resExcecoes] = await Promise.all([
+            const [resConfig, resMeses, resBloqueios] = await Promise.all([
                 _supabase.from('agenda_config').select('*').eq('id', 1).single(),
                 _supabase.from('meses_liberados').select('liberado').eq('mes_ano', mesAnoKey).single(),
-                _supabase.from('agenda_bloqueada').select('data_interditada'),
-                _supabase.from('agenda_excecoes').select('*') // ✅ BUSCA AS EXCEÇÕES
+                _supabase.from('agenda_bloqueada').select('data_interditada')
             ]);
 
-            if (resConfig.data) {
-                configAgenda = {
-                    inicio: resConfig.data.hora_inicio,
-                    fim: resConfig.data.hora_fim,
-                    intervalo: resConfig.data.intervalo_minutos
-                };
-            }
-
-            // Mapeia exceções para acesso rápido
-            if (resExcecoes.data) {
-                resExcecoes.data.forEach(ex => {
-                    excecoesHorarios[ex.data] = { inicio: ex.hora_inicio, fim: ex.hora_fim };
-                });
-            }
+            if (resConfig.data) configAgenda = { inicio: resConfig.data.hora_inicio, fim: resConfig.data.hora_fim, intervalo: resConfig.data.intervalo_minutos };
 
             if (!resMeses.data || !resMeses.data.liberado) {
-                container.innerHTML = `<p class="col-span-7 text-center text-xs text-zinc-400 py-4 italic">Agenda deste mês ainda não liberada pela Rivi. 🔒</p>`;
+                container.innerHTML = `<p class="col-span-7 text-center text-xs text-zinc-400 py-4 italic">Agenda fechada pela Rivi. 🔒</p>`;
                 return;
             }
 
@@ -122,12 +133,9 @@
             for(let i=0; i<primeiroDia; i++) container.innerHTML += '<div></div>';
 
             for(let d=1; d<=totalDias; d++) {
-                const dataComparacao = new Date(hoje.getFullYear(), hoje.getMonth(), d);
                 const dataStr = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                
-                const isPast = dataComparacao < hojeDataApenas;
+                const isPast = new Date(hoje.getFullYear(), hoje.getMonth(), d) < hojeDataApenas;
                 const isBlocked = listaBloqueados.includes(dataStr);
-                
                 const box = document.createElement('div');
                 box.className = `day-box ${ (isPast || isBlocked) ? 'day-busy' : 'day-free' }`;
                 box.innerText = d;
@@ -137,119 +145,85 @@
             carregarServicos();
         }
 
-        function gerarHorariosSlots(inicio, fim, intervalo) {
-            const slots = [];
-            let atual = new Date(`2026-01-01T${inicio}:00`);
-            const limite = new Date(`2026-01-01T${fim}:00`);
-            while (atual < limite) {
-                slots.push(atual.toTimeString().substring(0, 5));
-                atual.setMinutes(atual.getMinutes() + intervalo);
-            }
-            return slots;
-        }
-
         async function carregarHorarios(el, data) {
             document.querySelectorAll('.day-box').forEach(d => d.classList.remove('day-selected'));
             el.classList.add('day-selected');
             dataSelecionada = data;
             horaSelecionada = null;
-            
             document.getElementById('section-horarios').classList.remove('hidden');
             document.getElementById('display-date').innerText = data.split('-').reverse().join('/');
 
-            const { data: ocupados } = await _supabase.from('agendamentos')
-                .select('horario')
-                .eq('data_atendimento', data);
-            
+            const { data: ocupados } = await _supabase.from('agendamentos').select('horario').eq('data_atendimento', data);
             const listaOcupados = ocupados?.map(o => o.horario.substring(0, 5)) || [];
-
-            // ✅ VERIFICA SE HÁ EXCEÇÃO PARA O DIA SELECIONADO
-            const horarioDoDia = excecoesHorarios[data] || { inicio: configAgenda.inicio, fim: configAgenda.fim };
-            const horariosParaExibir = gerarHorariosSlots(horarioDoDia.inicio, horarioDoDia.fim, configAgenda.intervalo);
+            const slots = gerarSlots(configAgenda.inicio, configAgenda.fim, configAgenda.intervalo);
 
             const slotsDiv = document.getElementById('time-slots');
             slotsDiv.innerHTML = '';
-            
-            const agora = new Date();
-            const hojeFormatado = `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`;
-            const horaAtualStr = `${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}`;
-
-            horariosParaExibir.forEach(h => {
-                const isOcupado = listaOcupados.includes(h);
-                const jaPassou = (data === hojeFormatado && h <= horaAtualStr);
-                
+            slots.forEach(h => {
                 const btn = document.createElement('div');
-                btn.className = `time-slot ${ (isOcupado || jaPassou) ? 'occupied' : 'hover:border-gold'}`;
+                btn.className = `time-slot ${listaOcupados.includes(h) ? 'occupied' : 'hover:border-gold'}`;
                 btn.innerText = h;
-                
-                if(!isOcupado && !jaPassou) {
-                    btn.onclick = () => {
-                        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('time-selected'));
-                        btn.classList.add('time-selected');
-                        horaSelecionada = h;
-                    };
-                }
+                if(!listaOcupados.includes(h)) btn.onclick = () => {
+                    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('time-selected'));
+                    btn.classList.add('time-selected');
+                    horaSelecionada = h;
+                };
                 slotsDiv.appendChild(btn);
             });
         }
 
+        function gerarSlots(i, f, int) {
+            const s = []; let a = new Date(`2026-01-01T${i}:00`); const l = new Date(`2026-01-01T${f}:00`);
+            while(a < l) { s.push(a.toTimeString().substring(0, 5)); a.setMinutes(a.getMinutes() + int); }
+            return s;
+        }
+
         async function carregarServicos() {
             const { data } = await _supabase.from('servicos').select('*').order('nome');
-            if(data) {
-                document.getElementById('listaServicos').innerHTML = data.map(s => `
-                    <label class="flex justify-between items-center p-3 hover:bg-zinc-50 cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" value="${s.nome}" data-price="${s.preco}" onchange="calcTotal()" class="accent-gold w-4 h-4">
-                            <span class="text-sm font-medium text-zinc-700">${s.nome}</span>
-                        </div>
-                        <span class="text-zinc-400 text-xs font-bold">R$ ${s.preco}</span>
-                    </label>
-                `).join('');
-            }
+            if(data) document.getElementById('listaServicos').innerHTML = data.map(s => `
+                <label class="flex justify-between items-center p-3 hover:bg-zinc-50 cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" value="${s.nome}" data-price="${s.preco}" onchange="calcTotal()" class="accent-gold w-4 h-4">
+                        <span class="text-[10px] font-bold text-zinc-700 uppercase">${s.nome}</span>
+                    </div>
+                    <span class="text-zinc-400 text-[10px] font-bold">R$ ${s.preco}</span>
+                </label>`).join('');
         }
 
         function calcTotal() {
-            let total = 0;
-            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => total += parseFloat(c.dataset.price));
-            document.getElementById('totalDisplay').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+            let t = 0; document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => t += parseFloat(c.dataset.price));
+            document.getElementById('totalDisplay').innerText = `R$ ${t.toFixed(2).replace('.', ',')}`;
         }
 
         async function finalizarAgendamento() {
-            const nome = document.getElementById('nome').value;
-            const zap = document.getElementById('whatsapp').value;
+            const n = document.getElementById('nome').value;
+            const z = document.getElementById('whatsapp').value;
             const svs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
-            const totalTexto = document.getElementById('totalDisplay').innerText.replace('R$ ', '').replace(',', '.');
-            const btn = document.getElementById('btnAgendar');
+            const comp = document.getElementById('comprovante').files[0];
 
-            if(!nome || !zap || !dataSelecionada || !horaSelecionada || svs.length === 0) {
-                return alert("Falta preencher algo gata! 💅");
+            if(!n || !z || !dataSelecionada || !horaSelecionada || svs.length === 0 || !comp) {
+                return alert("Gata, preencha tudo e anexe o comprovante de R$ 50,00! 💅");
             }
 
-            btn.innerText = "RESERVANDO... ✨";
-            btn.disabled = true;
+            document.getElementById('btnAgendar').innerText = "RESERVANDO... ✨";
 
-            const payload = {
-                cliente_nome: nome.toUpperCase(),
-                telefone: zap,
-                data_atendimento: dataSelecionada,
-                horario: horaSelecionada,
-                servico: svs.join(", "),
-                valor: parseFloat(totalTexto),
-                status: "Aguardando"
-            };
+            const { error } = await _supabase.from('agendamentos').insert([{
+                cliente_nome: n.toUpperCase(), telefone: z, data_atendimento: dataSelecionada,
+                horario: horaSelecionada, servico: svs.join(", "), status: "Aguardando",
+                valor: parseFloat(document.getElementById('totalDisplay').innerText.replace('R$ ', '').replace(',', '.'))
+            }]);
 
-            const { error } = await _supabase.from('agendamentos').insert([payload]);
-
-            if(error) {
-                alert("Erro ao salvar: " + error.message);
-                btn.innerText = "CONFIRMAR AGENDAMENTO ✨";
-                btn.disabled = false;
-            } else {
-                alert("AGENDADO COM SUCESSO! 💖");
+            if(error) { 
+                alert("Erro ao salvar: " + error.message); 
+                document.getElementById('btnAgendar').innerText = "CONFIRMAR AGENDAMENTO 💅";
+            } 
+            else {
+                const msg = `Oi Rivi! Sou a ${n.toUpperCase()}. Agendei ${svs.join(", ")} para o dia ${dataSelecionada.split('-').reverse().join('/')} às ${horaSelecionada}. O comprovante do sinal de R$ 50,00 está em anexo. 💖💅`;
+                alert("RESERVADO! Agora envie o comprovante no WhatsApp.");
+                window.open(`https://wa.me/5571992447638?text=${encodeURIComponent(msg)}`, '_blank');
                 location.reload();
             }
         }
-
         init();
     </script>
 </body>
