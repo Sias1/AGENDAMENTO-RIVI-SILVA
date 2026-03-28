@@ -8,7 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #FFFFFF; font-family: 'Montserrat', sans-serif; }
+        body { 
+            background-color: #FFFFFF; 
+            font-family: 'Montserrat', sans-serif; 
+            background-image: radial-gradient(at 10% 10%, rgba(212, 175, 55, 0.05) 0px, transparent 50%); 
+        }
         .gold-text { color: #D4AF37; }
         .gold-bg { background: linear-gradient(135deg, #D4AF37 0%, #F5E6A3 100%); }
         .clean-card { background-color: #FDFDFD; border: 1px solid rgba(212, 175, 55, 0.15); box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05); }
@@ -25,19 +29,22 @@
         .contact-icon { color: #D4AF37; transition: transform 0.3s ease; }
         .contact-icon:hover { transform: scale(1.1); color: #B8860B; }
         
-        /* Ajuste da imagem lateral */
+        /* Ajuste da imagem lateral com degradê */
         .perfil-img {
-            mask-image: linear-gradient(to right, black 70%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%);
+            mask-image: linear-gradient(to right, black 60%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, black 60%, transparent 100%);
             object-fit: cover;
             object-position: top;
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
         }
         @media (max-width: 1024px) {
             .perfil-img {
                 mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
                 -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-                height: 350px;
-                width: 100%;
+                height: 300px;
+                border-radius: 24px 24px 0 0;
             }
         }
     </style>
@@ -54,17 +61,19 @@
             <a href="https://wa.me/5571992447638" target="_blank" class="contact-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             </a>
-            <a href="https://maps.app.goo.gl/vBK9K2Mo8VGcDKR38" target="_blank" class="contact-icon">
+            <a href="https://www.google.com/maps/search/?api=1&query=R.+José+Tibério,+1127+-+São+Caetano" target="_blank" class="contact-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
             </a>
         </div>
     </div>
 
-    <main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+    <main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
         
-        <div class="flex flex-col lg:flex-row gap-6 items-center lg:items-start lg:pr-10">
-            <img src="foto_perfil.jpg" alt="Rivi Silva" class="perfil-img w-full lg:w-1/2 rounded-3xl lg:rounded-none">
-            <div class="flex flex-col gap-6 mt-4 lg:mt-20">
+        <div class="flex flex-col gap-8">
+            <div class="relative w-full h-[400px] lg:h-[500px] overflow-hidden">
+                <img src="foto_perfil.jpg" alt="Rivi Silva" class="perfil-img">
+            </div>
+            <div class="flex flex-col gap-6 lg:pr-10">
                 <h2 class="text-4xl md:text-5xl font-light text-zinc-900 leading-tight">
                     Seu momento de brilhar começa aqui, <span class="font-semibold gold-text">gata. 💅</span>
                 </h2>
@@ -106,7 +115,167 @@
     </main>
 
     <script>
-        // ... (resto do script do Supabase permanece idêntico ao anterior)
+        const supabaseUrl = 'https://rahubkowehwtvditbhlx.supabase.co';
+        const supabaseKey = 'sb_publishable_wKbs4gYVURdIR6Cafm8qFA_tUZZTIKo'; 
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        let dataSelecionada = null;
+        let horaSelecionada = null;
+        let configPadrao = { inicio: '09:00', fim: '18:00', intervalo: 40 };
+        let bloqueios = [];
+        let excecoes = {};
+
+        function phoneMask(v) {
+            v = v.replace(/\D/g, "");
+            if (v.length > 11) v = v.substring(0, 11);
+            v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
+            v = v.replace(/(\d)(\d{4})$/, "$1-$2");
+            return v;
+        }
+
+        async function init() {
+            const container = document.getElementById('calendarDays');
+            const hoje = new Date();
+            const mesHoje = hoje.getMonth();
+            const anoHoje = hoje.getFullYear();
+            const mesAnoKey = `${anoHoje}-${String(mesHoje + 1).padStart(2, '0')}`;
+
+            const [resConfig, resBloqueios, resExcecoes, resMeses] = await Promise.all([
+                _supabase.from('agenda_config').select('*').eq('id', 1).single(),
+                _supabase.from('agenda_bloqueada').select('data_interditada'),
+                _supabase.from('agenda_excecoes').select('*'),
+                _supabase.from('meses_liberados').select('liberado').eq('mes_ano', mesAnoKey).single()
+            ]);
+
+            if (resConfig.data) configPadrao = { inicio: resConfig.data.hora_inicio, fim: resConfig.data.hora_fim, intervalo: resConfig.data.intervalo_minutos };
+            if (resBloqueios.data) bloqueios = resBloqueios.data.map(b => b.data_interditada);
+            
+            if (resExcecoes.data) {
+                resExcecoes.data.forEach(ex => {
+                    excecoes[ex.data] = { inicio: ex.hora_inicio, fim: ex.hora_fim };
+                });
+            }
+
+            if (!resMeses.data || !resMeses.data.liberado) {
+                container.innerHTML = `<p class="col-span-7 text-center py-10 text-xs font-bold text-zinc-400 uppercase">Agenda indisponível para este mês.</p>`;
+            } else {
+                renderCalendar(hoje);
+            }
+            carregarServicos();
+        }
+
+        function renderCalendar(hoje) {
+            const container = document.getElementById('calendarDays');
+            const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1).getDay();
+            const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
+            const diaAtual = hoje.getDate();
+
+            container.innerHTML = '';
+            for(let i=0; i<primeiroDia; i++) container.innerHTML += '<div></div>';
+
+            for(let d=1; d<=ultimoDia; d++) {
+                const dataStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const isBlocked = bloqueios.includes(dataStr);
+                const isPassado = d < diaAtual;
+
+                const box = document.createElement('div');
+                box.className = `day-box ${isPassado || isBlocked ? 'day-busy' : 'day-free'}`;
+                box.innerText = d;
+                
+                if(!isPassado && !isBlocked) {
+                    box.onclick = () => carregarHorarios(box, dataStr);
+                }
+                container.appendChild(box);
+            }
+        }
+
+        async function carregarHorarios(el, data) {
+            document.querySelectorAll('.day-box').forEach(d => d.classList.remove('day-selected'));
+            el.classList.add('day-selected');
+            dataSelecionada = data;
+            horaSelecionada = null;
+
+            document.getElementById('section-horarios').classList.remove('hidden');
+            document.getElementById('display-date').innerText = data.split('-').reverse().join('/');
+
+            const { data: ocupados } = await _supabase.from('agendamentos').select('horario').eq('data_atendimento', data).not('status', 'eq', 'Cancelado');
+            const ocupadosList = ocupados?.map(o => o.horario.substring(0, 5)) || [];
+            
+            const hI = excecoes[data] ? excecoes[data].inicio : configPadrao.inicio;
+            const hF = excecoes[data] ? excecoes[data].fim : configPadrao.fim;
+
+            const slotsDiv = document.getElementById('time-slots');
+            slotsDiv.innerHTML = ''; 
+
+            let [h, m] = hI.split(':').map(Number);
+            let [fimH, fimM] = hF.split(':').map(Number);
+            let totalMin = (h * 60) + m;
+            const totalFim = (fimH * 60) + fimM;
+
+            const agora = new Date();
+            const dataHojeStr = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`;
+            const agoraMin = (agora.getHours() * 60) + agora.getMinutes();
+
+            while (totalMin < totalFim) {
+                const hFormat = `${String(Math.floor(totalMin / 60)).padStart(2, '0')}:${String(totalMin % 60).padStart(2, '0')}`;
+                const isOcupado = ocupadosList.includes(hFormat);
+                const isPassado = (data === dataHojeStr && totalMin <= (agoraMin + 20));
+
+                const btn = document.createElement('div');
+                btn.className = `time-slot ${ (isOcupado || isPassado) ? 'occupied' : 'hover:gold-text hover:border-gold'}`;
+                btn.innerText = hFormat;
+
+                if (!isOcupado && !isPassado) {
+                    btn.onclick = () => {
+                        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('time-selected'));
+                        btn.classList.add('time-selected');
+                        horaSelecionada = hFormat;
+                    };
+                }
+                slotsDiv.appendChild(btn);
+                totalMin += parseInt(configPadrao.intervalo);
+            }
+        }
+
+        async function carregarServicos() {
+            const { data } = await _supabase.from('servicos').select('*').order('nome');
+            if(data) document.getElementById('listaServicos').innerHTML = data.map(s => `
+                <label class="flex justify-between items-center p-3 hover:bg-zinc-50 cursor-pointer border-b last:border-0 border-zinc-100">
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" value="${s.nome}" data-price="${s.preco}" onchange="calcTotal()" class="accent-gold w-4 h-4">
+                        <span class="font-bold text-zinc-800 uppercase tracking-tighter">${s.nome}</span>
+                    </div>
+                    <span class="text-zinc-400 font-bold">R$ ${s.preco}</span>
+                </label>`).join('');
+        }
+
+        function calcTotal() {
+            let t = 0; document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => t += parseFloat(c.dataset.price));
+            document.getElementById('totalDisplay').innerText = `R$ ${t.toFixed(2).replace('.', ',')}`;
+        }
+
+        async function finalizarAgendamento() {
+            const n = document.getElementById('nome').value;
+            const z = document.getElementById('whatsapp_input').value; 
+            const svs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
+
+            if(!n || z.length < 14 || !dataSelecionada || !horaSelecionada || svs.length === 0) {
+                return alert("Falta preencher algo, gata! 💅");
+            }
+
+            const { error } = await _supabase.from('agendamentos').insert([{
+                cliente_nome: n.toUpperCase(), telefone: z, data_atendimento: dataSelecionada,
+                horario: horaSelecionada, servico: svs.join(", "), status: "Aguardando",
+                valor: parseFloat(document.getElementById('totalDisplay').innerText.replace('R$ ', '').replace(',', '.'))
+            }]);
+
+            if(!error) {
+                const msg = `Agendamento Rivi Silva 💅\n\nNome: ${n.toUpperCase()}\nData: ${dataSelecionada.split('-').reverse().join('/')}\nHora: ${horaSelecionada}\nServiços: ${svs.join(", ")}\n\nsegue o meu comprovante com o sinal para garantir o meu agendamento!`;
+                window.open(`https://wa.me/5571992447638?text=${encodeURIComponent(msg)}`, '_blank');
+                location.reload();
+            }
+        }
+        init();
     </script>
 </body>
 </html>
