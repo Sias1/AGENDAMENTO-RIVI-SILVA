@@ -8,82 +8,55 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #FFFFFF; font-family: 'Montserrat', sans-serif; background-image: radial-gradient(at 10% 10%, rgba(212, 175, 55, 0.05) 0px, transparent 50%); }
+        body { background-color: #FFFFFF; font-family: 'Montserrat', sans-serif; }
         .gold-text { color: #D4AF37; }
         .gold-bg { background: linear-gradient(135deg, #D4AF37 0%, #F5E6A3 100%); }
         .clean-card { background-color: #FDFDFD; border: 1px solid rgba(212, 175, 55, 0.15); box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05); }
-        .form-input { border: 1px solid rgba(212, 175, 55, 0.2) !important; transition: 0.3s; }
-        .form-input:focus { border-color: #D4AF37 !important; box-shadow: 0 0 0 1px #D4AF37 !important; outline: none; }
+        .form-input { border: 1px solid rgba(212, 175, 55, 0.2) !important; outline: none; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-        .day-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; transition: 0.2s; border: 1px solid #eee; font-size: 0.85rem; font-weight: 600; }
+        .day-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; border: 1px solid #eee; font-size: 0.85rem; font-weight: 600; }
         .day-free { background: #f0fdf4; color: #166534; border-color: #bbf7d0; } 
         .day-busy { background: #fef2f2; color: #991b1b; border-color: #fecaca; cursor: not-allowed; opacity: 0.5; }
         .day-selected { background: #D4AF37 !important; color: white !important; border-color: #D4AF37 !important; }
-        .time-slot { padding: 10px; border: 1px solid #eee; border-radius: 10px; text-align: center; cursor: pointer; font-size: 0.85rem; background: white; transition: 0.2s; }
-        .time-selected { background: #D4AF37; color: white; border-color: #D4AF37; }
+        .time-slot { padding: 10px; border: 1px solid #eee; border-radius: 10px; text-align: center; cursor: pointer; background: white; font-size: 0.85rem; }
+        .time-selected { background: #D4AF37; color: white; }
         .occupied { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; text-decoration: line-through; }
-        .contact-icon { color: #D4AF37; transition: transform 0.3s ease; }
-        .contact-icon:hover { transform: scale(1.1); color: #B8860B; }
     </style>
 </head>
-<body class="p-4 md:p-8 flex flex-col items-center min-h-screen">
+<body class="p-4 flex flex-col items-center min-h-screen">
 
-    <div class="mb-8 flex flex-col items-center gap-4">
-        <img src="logo.png" alt="Rivi Silva Esmalteria" class="h-24 md:h-32 object-contain">
-        <p class="text-[10px] gold-text font-bold uppercase tracking-[0.4em]">Design de Luxo</p>
-        <div class="flex gap-6 items-center pt-2">
-            <a href="https://www.instagram.com/esmalteria_rivi" target="_blank" class="contact-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-            </a>
-            <a href="https://wa.me/5571992447638" target="_blank" class="contact-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            </a>
-            <a href="https://maps.app.goo.gl/vBK9K2Mo8VGcDKR38" target="_blank" class="contact-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-            </a>
+    <div class="w-full max-w-md clean-card p-6 rounded-3xl space-y-6">
+        <div class="text-center">
+            <h2 class="text-2xl font-bold gold-text uppercase">Rivi Silva</h2>
+            <p class="text-zinc-500 text-[10px] tracking-widest uppercase">Esmalteria & Estética</p>
+        </div>
+
+        <div class="space-y-3">
+            <input id="nome" type="text" placeholder="SEU NOME COMPLETO" class="form-input w-full p-4 rounded-xl uppercase text-sm font-bold">
+            <input id="whatsapp_input" type="tel" maxlength="15" oninput="this.value = phoneMask(this.value)" placeholder="(71) 00000-0000" class="form-input w-full p-4 rounded-xl text-sm font-bold">
+        </div>
+
+        <div id="listaServicos" class="max-h-40 overflow-y-auto border rounded-xl p-2 bg-white text-[10px]"></div>
+        
+        <div class="p-4 bg-zinc-900 rounded-xl flex justify-between items-center text-white">
+            <span class="text-zinc-400 font-bold text-xs uppercase">Total:</span>
+            <span id="totalDisplay" class="text-xl font-bold gold-text">R$ 0,00</span>
+        </div>
+
+        <div>
+            <p class="text-[10px] font-black text-zinc-400 uppercase mb-3 text-center tracking-widest">Escolha a Data</p>
+            <div id="calendarDays" class="calendar-grid"></div>
+        </div>
+
+        <div id="section-horarios" class="hidden space-y-4 pt-4 border-t">
+            <p class="text-[10px] font-black text-zinc-400 uppercase text-center tracking-widest">Horários para <span id="display-date" class="gold-text">--/--</span></p>
+            <div id="time-slots" class="grid grid-cols-3 gap-2"></div>
+            
+            <button id="btnAgendar" onclick="finalizarAgendamento()" class="w-full gold-bg text-zinc-900 font-black py-5 rounded-2xl shadow-lg uppercase text-xs tracking-widest">
+                Confirmar Agendamento 💅
+            </button>
         </div>
     </div>
-
-    <main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <div class="flex flex-col gap-6 lg:pr-10">
-            <h2 class="text-4xl md:text-5xl font-light text-zinc-900 leading-tight">
-                Seu momento de brilhar começa aqui, <span class="font-semibold gold-text">gata. 💅</span>
-            </h2>
-            <p class="text-zinc-600 text-lg italic border-l-2 border-gold pl-4">"Unhas feitas, auto-estima renovada."</p>
-        </div>
-
-        <div class="w-full clean-card p-6 md:p-10 rounded-3xl space-y-6">
-            <h3 class="text-xl font-semibold text-gold text-center uppercase tracking-widest mb-6">Solicitar Agendamento</h3>
-
-            <div class="space-y-4">
-                <input id="nome" type="text" placeholder="Seu Nome Completo" class="form-input w-full p-4 rounded-xl uppercase text-xs font-bold bg-zinc-50">
-                <input id="whatsapp_input" type="tel" maxlength="15" oninput="this.value = phoneMask(this.value)" placeholder="(71) 00000-0000" class="form-input w-full p-4 rounded-xl text-xs font-bold bg-zinc-50">
-            </div>
-
-            <div>
-                <label class="block text-xs font-bold text-zinc-400 uppercase mb-2">Serviços</label>
-                <div id="listaServicos" class="grid grid-cols-1 gap-1 max-h-40 overflow-y-auto border border-zinc-100 rounded-xl p-2 bg-white text-[10px]"></div>
-                <div class="mt-3 p-4 bg-zinc-900 rounded-xl flex justify-between items-center text-white shadow-xl">
-                    <span class="text-zinc-400 font-bold text-xs uppercase">Total:</span>
-                    <span id="totalDisplay" class="text-2xl font-bold gold-text">R$ 0,00</span>
-                </div>
-            </div>
-
-            <div class="pt-4 border-t">
-                <label class="block text-xs font-bold text-zinc-400 uppercase mb-3 text-center tracking-widest">Escolha a Data</label>
-                <div id="calendarDays" class="calendar-grid"></div>
-            </div>
-
-            <div id="section-horarios" class="hidden space-y-4 pt-4 border-t border-zinc-100">
-                <label class="block text-xs font-bold text-zinc-400 uppercase text-center tracking-widest">Horários para <span id="display-date" class="gold-text">--/--</span></label>
-                <div id="time-slots" class="grid grid-cols-3 gap-2 pb-4"></div>
-                
-                <button id="btnAgendar" onclick="finalizarAgendamento()" class="w-full gold-bg text-zinc-900 font-black py-5 rounded-xl shadow-lg uppercase text-[11px] tracking-widest active:scale-95 transition-all">
-                    Confirmar Agendamento 💅
-                </button>
-            </div>
-        </div>
-    </main>
 
     <script>
         const supabaseUrl = 'https://rahubkowehwtvditbhlx.supabase.co';
@@ -105,12 +78,8 @@
         }
 
         async function init() {
-            const container = document.getElementById('calendarDays');
             const hoje = new Date();
-            const diaHoje = hoje.getDate();
-            const mesHoje = hoje.getMonth();
-            const anoHoje = hoje.getFullYear();
-            const mesAnoKey = `${anoHoje}-${String(mesHoje + 1).padStart(2, '0')}`;
+            const mesAnoKey = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;
 
             const [resConfig, resBloqueios, resExcecoes, resMeses] = await Promise.all([
                 _supabase.from('agenda_config').select('*').eq('id', 1).single(),
@@ -121,16 +90,10 @@
 
             if (resConfig.data) configPadrao = { inicio: resConfig.data.hora_inicio, fim: resConfig.data.hora_fim, intervalo: resConfig.data.intervalo_minutos };
             if (resBloqueios.data) bloqueios = resBloqueios.data.map(b => b.data_interditada);
-            
-            // ✅ CARREGA A TABELA CORRETA DO SEU PAINEL
-            if (resExcecoes.data) {
-                resExcecoes.data.forEach(ex => {
-                    excecoes[ex.data] = { inicio: ex.hora_inicio, fim: ex.hora_fim };
-                });
-            }
+            if (resExcecoes.data) resExcecoes.data.forEach(ex => excecoes[ex.data] = { inicio: ex.hora_inicio, fim: ex.hora_fim });
 
             if (!resMeses.data || !resMeses.data.liberado) {
-                container.innerHTML = `<p class="col-span-7 text-center py-10 text-xs font-bold text-zinc-400 uppercase">Agenda indisponível para este mês.</p>`;
+                document.getElementById('calendarDays').innerHTML = '<p class="col-span-7 text-center py-10 text-xs font-bold text-zinc-400">AGENDA FECHADA ESTE MÊS.</p>';
             } else {
                 renderCalendar(hoje);
             }
@@ -152,7 +115,6 @@
                 const isPassado = d < diaAtual;
 
                 const box = document.createElement('div');
-                // Visual padrão (Verde livre, Vermelho bloqueado)
                 box.className = `day-box ${isPassado || isBlocked ? 'day-busy' : 'day-free'}`;
                 box.innerText = d;
                 
@@ -175,7 +137,7 @@
             const { data: ocupados } = await _supabase.from('agendamentos').select('horario').eq('data_atendimento', data).not('status', 'eq', 'Cancelado');
             const ocupadosList = ocupados?.map(o => o.horario.substring(0, 5)) || [];
             
-            // ✅ USA HORÁRIO ESPECIAL DO PAINEL SE EXISTIR
+            // Usa horário da exceção se existir, senão usa o padrão
             const hI = excecoes[data] ? excecoes[data].inicio : configPadrao.inicio;
             const hF = excecoes[data] ? excecoes[data].fim : configPadrao.fim;
 
@@ -197,7 +159,7 @@
                 const isPassado = (data === dataHojeStr && totalMin <= (agoraMin + 20));
 
                 const btn = document.createElement('div');
-                btn.className = `time-slot ${ (isOcupado || isPassado) ? 'occupied' : 'hover:gold-text hover:border-gold'}`;
+                btn.className = `time-slot ${ (isOcupado || isPassado) ? 'occupied' : 'hover:border-gold'}`;
                 btn.innerText = hFormat;
 
                 if (!isOcupado && !isPassado) {
@@ -215,10 +177,10 @@
         async function carregarServicos() {
             const { data } = await _supabase.from('servicos').select('*').order('nome');
             if(data) document.getElementById('listaServicos').innerHTML = data.map(s => `
-                <label class="flex justify-between items-center p-3 hover:bg-zinc-50 cursor-pointer border-b last:border-0 border-zinc-100">
+                <label class="flex justify-between items-center p-3 hover:bg-zinc-50 cursor-pointer border-b border-zinc-50">
                     <div class="flex items-center gap-3">
                         <input type="checkbox" value="${s.nome}" data-price="${s.preco}" onchange="calcTotal()" class="accent-gold w-4 h-4">
-                        <span class="font-bold text-zinc-800 uppercase tracking-tighter">${s.nome}</span>
+                        <span class="font-bold text-zinc-800 uppercase">${s.nome}</span>
                     </div>
                     <span class="text-zinc-400 font-bold">R$ ${s.preco}</span>
                 </label>`).join('');
@@ -235,7 +197,7 @@
             const svs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
 
             if(!n || z.length < 14 || !dataSelecionada || !horaSelecionada || svs.length === 0) {
-                return alert("Falta preencher algo, gata! 💅");
+                return alert("Preencha tudo certinho! 💅");
             }
 
             const { error } = await _supabase.from('agendamentos').insert([{
@@ -245,9 +207,7 @@
             }]);
 
             if(!error) {
-                // ✅ MENSAGEM DO WHATSAPP ATUALIZADA COM A COBRANÇA DO SINAL
-                const msg = `Agendamento Rivi Silva 💅\n\nNome: ${n.toUpperCase()}\nData: ${dataSelecionada.split('-').reverse().join('/')}\nHora: ${horaSelecionada}\nServiços: ${svs.join(", ")}\n\nsegue o meu comprovante com o sinal para garantir o meu agendamento!`;
-                
+                const msg = `Agendamento Rivi Silva 💅\n\nNome: ${n.toUpperCase()}\nData: ${dataSelecionada.split('-').reverse().join('/')}\nHora: ${horaSelecionada}\nServiços: ${svs.join(", ")}`;
                 window.open(`https://wa.me/5571992447638?text=${encodeURIComponent(msg)}`, '_blank');
                 location.reload();
             }
