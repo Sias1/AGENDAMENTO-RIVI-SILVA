@@ -24,7 +24,6 @@
         .day-free { background: #f0fdf4; color: #166534; border-color: #bbf7d0; } 
         .day-busy { background: #fef2f2; color: #991b1b; border-color: #fecaca; cursor: not-allowed; opacity: 0.5; }
         .day-selected { background: #D4AF37 !important; color: white !important; border-color: #D4AF37 !important; }
-        
         .time-slot { padding: 10px; border: 1px solid #eee; border-radius: 10px; text-align: center; cursor: pointer; font-size: 0.85rem; background: white; transition: 0.2s; }
         .time-selected { background: #D4AF37; color: white; border-color: #D4AF37; }
         .occupied { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; text-decoration: line-through; }
@@ -35,56 +34,48 @@
             object-fit: cover;
             object-position: top;
         }
-
-        @keyframes shimmer {
-            100% { transform: translateX(300%); }
-        }
-
         @media (max-width: 1024px) {
             .perfil-img {
-                mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-                -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+                mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+                -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
                 height: 350px;
                 width: 100%;
-                border-radius: 24px;
             }
         }
     </style>
 </head>
 <body class="p-4 md:p-8 flex flex-col items-center min-h-screen">
 
-    <header class="mb-8 flex flex-col items-center gap-4 text-center w-full">
+    <div class="mb-8 flex flex-col items-center gap-2 text-center">
         <img src="logo.png" alt="Rivi Silva Esmalteria" class="h-24 md:h-32 object-contain">
+        <p class="text-[10px] gold-text font-bold uppercase tracking-[0.4em] mb-2">Design de Luxo</p>
         
-        <div class="flex gap-10 items-center justify-center py-2">
-            <a href="https://www.instagram.com/esmalteria_rivi?igsh=MWx2dzNxenRmYzF0bQ==" target="_blank" class="hover:scale-125 transition-all duration-300 group flex flex-col items-center">
+        <div class="flex gap-8 items-center justify-center">
+            <a href="https://www.instagram.com/esmalteria_rivi?igsh=MWx2dzNxenRmYzF0bQ==" target="_blank" class="hover:scale-125 transition-transform duration-300">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-                <span class="block text-[8px] font-bold text-zinc-400 mt-1 uppercase tracking-tighter">Insta</span>
             </a>
-            <a href="https://wa.me/5571992447638" target="_blank" class="hover:scale-125 transition-all duration-300 group flex flex-col items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
-                <span class="block text-[8px] font-bold text-zinc-400 mt-1 uppercase tracking-tighter">Zap</span>
+            <a href="https://wa.me/5571992447638" target="_blank" class="hover:scale-125 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             </a>
-            <a href="https://maps.app.goo.gl/vBK9K2Mo8VGcDKR38" target="_blank" class="hover:scale-125 transition-all duration-300 group flex flex-col items-center">
+            <a href="https://maps.app.goo.gl/vBK9K2Mo8VGcDKR38" target="_blank" class="hover:scale-125 transition-transform duration-300">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                <span class="block text-[8px] font-bold text-zinc-400 mt-1 uppercase tracking-tighter">Local</span>
             </a>
         </div>
-        <p class="text-[10px] gold-text font-bold uppercase tracking-[0.5em]">Premium Experience</p>
-    </header>
+    </div>
 
     <main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        <div class="flex flex-col lg:flex-row gap-6 items-center lg:items-start lg:pr-10 order-2 lg:order-1">
+        
+        <div class="flex flex-col lg:flex-row gap-6 items-center lg:items-start lg:pr-10">
             <img src="foto_perfil.jpg" alt="Rivi Silva" class="perfil-img w-full lg:w-1/2 rounded-3xl lg:rounded-none">
             <div class="flex flex-col gap-6 mt-4 lg:mt-20">
                 <h2 class="text-4xl md:text-5xl font-light text-zinc-900 leading-tight text-center lg:text-left">
                     Seu momento de brilhar começa aqui! <span class="font-semibold gold-text"> 💅</span>
                 </h2>
-                <p class="text-zinc-600 text-lg italic border-l-2 border-[#D4AF37] pl-4 hidden lg:block">"Unhas feitas, auto-estima renovada."</p>
+                <p class="text-zinc-600 text-lg italic border-l-2 border-[#D4AF37] pl-4">"Unhas feitas, auto-estima renovada."</p>
             </div>
         </div>
 
-        <div class="w-full clean-card p-6 md:p-10 rounded-3xl space-y-6 order-1 lg:order-2">
+        <div class="w-full clean-card p-6 md:p-10 rounded-3xl space-y-6">
             <h3 class="text-xl font-semibold gold-text text-center uppercase tracking-widest mb-6">Solicitar Agendamento</h3>
 
             <div class="space-y-4">
@@ -127,7 +118,7 @@
                 
                 <div class="p-5 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col items-center gap-3">
                     <p class="text-[11px] text-amber-800 font-bold uppercase text-center leading-relaxed">
-                        Para confirmar o agendamento envie o sinal de <span class="text-lg block font-black">R$ 50,00</span>
+                        Para confirmar o agendamento envie um sinal de <span class="text-lg block font-black">R$ 50,00</span>
                     </p>
                     <div class="w-full space-y-1">
                         <span class="text-[9px] text-amber-600 font-bold uppercase block text-center">Chave PIX (Telefone) Ryan Caique Santana</span>
@@ -138,10 +129,8 @@
                     </div>
                 </div>
 
-                <button id="btnAgendar" onclick="finalizarAgendamento()" class="relative overflow-hidden group w-full bg-[#25D366] text-white font-black py-5 rounded-xl shadow-lg uppercase text-[11px] tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all">
-                    <div class="absolute inset-0 w-1/2 h-full bg-white/20 skew-x-[-30deg] -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
-                    <i data-lucide="check-circle" class="w-5 h-5"></i> 
-                    Confirmar e enviar comprovante 💅
+                <button id="btnAgendar" onclick="finalizarAgendamento()" class="w-full bg-[#25D366] text-white font-black py-5 rounded-xl shadow-lg uppercase text-[11px] tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i> Confirmar Agendamento 💅
                 </button>
             </div>
         </div>
@@ -152,11 +141,9 @@
         const supabaseKey = 'sb_publishable_wKbs4gYVURdIR6Cafm8qFA_tUZZTIKo'; 
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        let dataSelecionada = null;
-        let horaSelecionada = null;
+        let dataSelecionada = null, horaSelecionada = null;
         let configPadrao = { inicio: '09:00', fim: '18:00', intervalo: 40 };
-        let bloqueios = [];
-        let excecoes = {};
+        let bloqueios = [], excecoes = {};
 
         function phoneMask(v) {
             v = v.replace(/\D/g, "");
@@ -190,9 +177,7 @@
 
             if (!resMeses.data || !resMeses.data.liberado) {
                 container.innerHTML = `<p class="col-span-7 text-center py-10 text-xs font-bold text-zinc-400 uppercase">Agenda fechada.</p>`;
-            } else {
-                renderCalendar(hoje);
-            }
+            } else { renderCalendar(hoje); }
             carregarServicos();
         }
 
@@ -210,9 +195,7 @@
                 const box = document.createElement('div');
                 box.className = `day-box ${isPassado || isBlocked ? 'day-busy' : 'day-free'}`;
                 box.innerText = d;
-                if(!isPassado && !isBlocked) {
-                    box.onclick = () => carregarHorarios(box, dataStr);
-                }
+                if(!isPassado && !isBlocked) { box.onclick = () => carregarHorarios(box, dataStr); }
                 container.appendChild(box);
             }
         }
@@ -220,34 +203,25 @@
         async function carregarHorarios(el, data) {
             document.querySelectorAll('.day-box').forEach(d => d.classList.remove('day-selected'));
             el.classList.add('day-selected');
-            dataSelecionada = data;
-            horaSelecionada = null;
+            dataSelecionada = data; horaSelecionada = null;
             document.getElementById('section-horarios').classList.remove('hidden');
             document.getElementById('display-date').innerText = data.split('-').reverse().join('/');
             const { data: ocupados } = await _supabase.from('agendamentos').select('horario').eq('data_atendimento', data).not('status', 'eq', 'Cancelado');
             const ocupadosList = ocupados?.map(o => o.horario.substring(0, 5)) || [];
-            const hI = excecoes[data] ? excecoes[data].inicio : configPadrao.inicio;
-            const hF = excecoes[data] ? excecoes[data].fim : configPadrao.fim;
-            const slotsDiv = document.getElementById('time-slots');
-            slotsDiv.innerHTML = ''; 
+            const hI = excecoes[data]?.inicio || configPadrao.inicio, hF = excecoes[data]?.fim || configPadrao.fim;
+            const slotsDiv = document.getElementById('time-slots'); slotsDiv.innerHTML = ''; 
             let [h, m] = hI.split(':').map(Number);
-            let [fimH, fimM] = hF.split(':').map(Number);
             let totalMin = (h * 60) + m;
-            const totalFim = (fimH * 60) + fimM;
-            const agora = new Date();
+            const totalFim = (parseInt(hF.split(':')[0]) * 60) + parseInt(hF.split(':')[1]);
             while (totalMin < totalFim) {
                 const hFormat = `${String(Math.floor(totalMin / 60)).padStart(2, '0')}:${String(totalMin % 60).padStart(2, '0')}`;
-                const isOcupado = ocupadosList.includes(hFormat);
                 const btn = document.createElement('div');
-                btn.className = `time-slot ${ isOcupado ? 'occupied' : 'hover:gold-text'}`;
+                btn.className = `time-slot ${ocupadosList.includes(hFormat) ? 'occupied' : 'hover:gold-text'}`;
                 btn.innerText = hFormat;
-                if (!isOcupado) {
-                    btn.onclick = () => {
-                        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('time-selected'));
-                        btn.classList.add('time-selected');
-                        horaSelecionada = hFormat;
-                    };
-                }
+                if (!ocupadosList.includes(hFormat)) btn.onclick = () => {
+                    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('time-selected'));
+                    btn.classList.add('time-selected'); horaSelecionada = hFormat;
+                };
                 slotsDiv.appendChild(btn);
                 totalMin += parseInt(configPadrao.intervalo);
             }
@@ -256,10 +230,10 @@
         async function carregarServicos() {
             const { data } = await _supabase.from('servicos').select('*').order('nome');
             if(data) document.getElementById('listaServicos').innerHTML = data.map(s => `
-                <label class="flex justify-between items-center p-3 border-b last:border-0 border-zinc-100">
+                <label class="flex justify-between items-center p-3 hover:bg-zinc-50 border-b last:border-0 border-zinc-100 cursor-pointer">
                     <div class="flex items-center gap-3">
                         <input type="checkbox" value="${s.nome}" data-price="${s.preco}" onchange="calcTotal()" class="accent-[#D4AF37] w-4 h-4">
-                        <span class="font-bold text-zinc-800 uppercase tracking-tighter">${s.nome}</span>
+                        <span class="font-bold text-zinc-800 uppercase text-[10px] tracking-tighter">${s.nome}</span>
                     </div>
                     <span class="text-zinc-400 font-bold">R$ ${s.preco.toFixed(2).replace('.', ',')}</span>
                 </label>`).join('');
@@ -271,26 +245,17 @@
         }
 
         async function finalizarAgendamento() {
-            const n = document.getElementById('nome').value.trim();
-            const z = document.getElementById('whatsapp_input').value; 
-            const checkedSvs = document.querySelectorAll('input[type="checkbox"]:checked');
-            const svs = Array.from(checkedSvs).map(c => c.value);
-            if(!n || z.length < 14 || !dataSelecionada || !horaSelecionada || svs.length === 0) {
-                return alert("Falta preencher algo, gata! 💅");
-            }
-            const total = document.getElementById('totalDisplay').innerText;
+            const n = document.getElementById('nome').value.trim(), z = document.getElementById('whatsapp_input').value; 
+            const svs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
+            if(!n || z.length < 14 || !dataSelecionada || !horaSelecionada || svs.length === 0) return alert("Preencha tudo, gata! 💅");
+            const totalStr = document.getElementById('totalDisplay').innerText;
             const { error } = await _supabase.from('agendamentos').insert([{
                 cliente_nome: n.toUpperCase(), telefone: z, data_atendimento: dataSelecionada,
                 horario: horaSelecionada, servico: svs.join(", "), status: "Aguardando",
-                valor: parseFloat(total.replace('R$ ', '').replace(',', '.'))
+                valor: parseFloat(totalStr.replace('R$ ', '').replace(',', '.'))
             }]);
             if(!error) {
-                const msg = `Agendamento Rivi Silva 💅\n\n` +
-                            `Nome: ${n.toUpperCase()}\n` +
-                            `Data: ${dataSelecionada.split('-').reverse().join('/')}\n` +
-                            `Hora: ${horaSelecionada}\n` +
-                            `Serviços: ${svs.join(", ")}\n\n` +
-                            `segue o meu comprovante com o sinal para garantir o meu agendamento!`;
+                const msg = `Agendamento Rivi Silva 💅\n\nNome: ${n.toUpperCase()}\nData: ${dataSelecionada.split('-').reverse().join('/')}\nHora: ${horaSelecionada}\nServiços: ${svs.join(", ")}\nTotal: ${totalStr}\n\nsegue o comprovante do sinal!`;
                 window.open(`https://wa.me/5571992447638?text=${encodeURIComponent(msg)}`, '_blank');
                 setTimeout(() => { location.reload(); }, 1500);
             } else { alert("Erro ao salvar."); }
