@@ -29,7 +29,7 @@
 
         .time-slot { padding: 10px; border: 1px solid #eee; border-radius: 10px; text-align: center; cursor: pointer; font-size: 0.85rem; background: white; transition: 0.2s; }
         .time-selected { background: #D4AF37; color: white; border-color: #D4AF37; }
-        .occupied { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; text-decoration: line-through; }
+        .occupied { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; text-decoration: line-through; pointer-events: none; }
         
         .perfil-img { mask-image: linear-gradient(to right, black 70%, transparent 100%); -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%); object-fit: cover; object-position: top; }
         @media (max-width: 1024px) { .perfil-img { mask-image: linear-gradient(to bottom, black 70%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%); height: 350px; width: 100%; } }
@@ -43,7 +43,11 @@
         
         <div class="flex gap-8 items-center justify-center">
             <a href="https://www.instagram.com/esmalteria_rivi?igsh=MWx2dzNxenRmYzF0bQ==" target="_blank" class="hover:scale-125 transition-transform duration-300">
-                <i data-lucide="instagram" class="text-[#D4AF37]"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
             </a>
             <a href="https://api.whatsapp.com/send?phone=5571992447638" class="hover:scale-125 transition-transform duration-300">
                 <i data-lucide="smartphone" class="text-[#D4AF37]"></i>
@@ -157,6 +161,7 @@
         async function init() {
             carregarServicos();
             await atualizarCalendario();
+            if (window.lucide) lucide.createIcons();
         }
 
         async function mudarMes(direcao) {
@@ -191,7 +196,7 @@
             } else { 
                 renderCalendar(mesVisualizado); 
             }
-            if (window.lucide) { lucide.createIcons(); }
+            if (window.lucide) lucide.createIcons();
         }
 
         function renderCalendar(dataBase) {
@@ -220,25 +225,41 @@
             dataSelecionada = data; horaSelecionada = null;
             document.getElementById('section-horarios').classList.remove('hidden');
             document.getElementById('display-date').innerText = data.split('-').reverse().join('/');
+            
             const { data: ocupados } = await _supabase.from('agendamentos').select('horario').eq('data_atendimento', data).not('status', 'eq', 'Cancelado');
             const ocupadosList = ocupados?.map(o => o.horario.substring(0, 5)) || [];
+            
             const hI = excecoes[data]?.inicio || configPadrao.inicio, hF = excecoes[data]?.fim || configPadrao.fim;
             const slotsDiv = document.getElementById('time-slots'); slotsDiv.innerHTML = ''; 
+            
             let [h, m] = hI.split(':').map(Number);
             let totalMin = (h * 60) + m;
             const totalFim = (parseInt(hF.split(':')[0]) * 60) + parseInt(hF.split(':')[1]);
+
+            // Bloqueio de horários retroativos para HOJE
+            const agora = new Date();
+            const hojeStr = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`;
+            const horaAtualMinutos = (agora.getHours() * 60) + agora.getMinutes();
+
             while (totalMin < totalFim) {
                 const hFormat = `${String(Math.floor(totalMin / 60)).padStart(2, '0')}:${String(totalMin % 60).padStart(2, '0')}`;
+                
+                const jaPassou = (data === hojeStr && totalMin <= horaAtualMinutos);
+                const isOcupado = ocupadosList.includes(hFormat) || jaPassou;
+
                 const btn = document.createElement('div');
-                btn.className = `time-slot ${ocupadosList.includes(hFormat) ? 'occupied' : 'hover:gold-text'}`;
+                btn.className = `time-slot ${isOcupado ? 'occupied' : 'hover:gold-text'}`;
                 btn.innerText = hFormat;
-                if (!ocupadosList.includes(hFormat)) btn.onclick = () => {
+                
+                if (!isOcupado) btn.onclick = () => {
                     document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('time-selected'));
                     btn.classList.add('time-selected'); horaSelecionada = hFormat;
                 };
+                
                 slotsDiv.appendChild(btn);
                 totalMin += parseInt(configPadrao.intervalo);
             }
+            if (window.lucide) lucide.createIcons();
         }
 
         async function carregarServicos() {
@@ -265,7 +286,6 @@
 
             if(!error) {
                 const msg = `Agendamento Rivi Silva 💅\n\nNome: ${n.toUpperCase()}\nData: ${dataSelecionada.split('-').reverse().join('/')}\nHora: ${horaSelecionada}\nServiços: ${svs.join(", ")}\nTotal: ${totalStr}\n\nsegue o meu comprovante com o sinal para garantir o meu agendamento!`;
-                // Usando location.href para forçar redirecionamento na mesma aba (mais eficaz em celulares)
                 window.location.href = `https://api.whatsapp.com/send?phone=5571992447638&text=${encodeURIComponent(msg)}`;
             } else { alert("Erro ao agendar."); }
         }
