@@ -45,10 +45,10 @@
             <a href="https://www.instagram.com/esmalteria_rivi?igsh=MWx2dzNxenRmYzF0bQ==" target="_blank" class="hover:scale-125 transition-transform duration-300">
                 <i data-lucide="instagram" class="text-[#D4AF37]"></i>
             </a>
-            <a href="https://wa.me/5571992447638" target="_blank" class="hover:scale-125 transition-transform duration-300">
-                <i data-lucide="phone" class="text-[#D4AF37]"></i>
+            <a href="https://api.whatsapp.com/send?phone=5571992447638" target="_blank" class="hover:scale-125 transition-transform duration-300">
+                <i data-lucide="smartphone" class="text-[#D4AF37]"></i>
             </a>
-            <a href="#" target="_blank" class="hover:scale-125 transition-transform duration-300">
+            <a href="https://maps.app.goo.gl/vBK9K2Mo8VGcDKR38" target="_blank" class="hover:scale-125 transition-transform duration-300">
                 <i data-lucide="map-pin" class="text-[#D4AF37]"></i>
             </a>
         </div>
@@ -109,6 +109,21 @@
                     <i data-lucide="clock" class="w-4 h-4 gold-text"></i> Horários para <span id="display-date" class="gold-text">--/--</span>
                 </label>
                 <div id="time-slots" class="grid grid-cols-3 gap-2 pb-4"></div>
+
+                <div class="p-5 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col items-center gap-3">
+                    <p class="text-[11px] text-amber-800 font-bold uppercase text-center leading-relaxed">
+                        Para confirmar o agendamento envie um sinal de <span class="text-lg block font-black">R$ 50,00</span>
+                    </p>
+                    <div class="w-full space-y-1">
+                        <span class="text-[9px] text-amber-600 font-bold uppercase block text-center">Chave PIX (Telefone) Ryan Caique Santana</span>
+                        <div class="flex items-center gap-2 bg-white p-3 rounded-xl border border-amber-200">
+                            <i data-lucide="qr-code" class="w-4 h-4 text-amber-600"></i>
+                            <input id="pixKey" type="text" value="(71) 99244-7638" readonly class="bg-transparent text-center text-xs font-bold text-zinc-700 w-full outline-none">
+                            <button onclick="copyPix()" class="gold-bg text-zinc-900 text-[10px] font-bold px-4 py-2 rounded-lg active:scale-95 transition-all">COPIAR</button>
+                        </div>
+                    </div>
+                </div>
+
                 <button id="btnAgendar" onclick="finalizarAgendamento()" class="w-full bg-[#25D366] text-white font-black py-5 rounded-xl shadow-lg uppercase text-[11px] tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all">
                     <i data-lucide="check-circle" class="w-5 h-5"></i> Confirmar Agendamento 💅
                 </button>
@@ -134,6 +149,11 @@
             return v;
         }
 
+        function copyPix() {
+            const pixVal = document.getElementById('pixKey').value;
+            navigator.clipboard.writeText(pixVal).then(() => { alert("Chave PIX copiada! 💅"); });
+        }
+
         async function init() {
             carregarServicos();
             await atualizarCalendario();
@@ -149,9 +169,7 @@
             const container = document.getElementById('calendarDays');
             const labelMes = document.getElementById('mesAnoAtual');
             const mesesNomes = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-            
             labelMes.innerText = `${mesesNomes[mesVisualizado.getMonth()]} ${mesVisualizado.getFullYear()}`;
-            
             const ano = mesVisualizado.getFullYear();
             const mes = String(mesVisualizado.getMonth() + 1).padStart(2, '0');
             const mesAnoKey = `${ano}-${mes}`;
@@ -168,18 +186,8 @@
             excecoes = {};
             if (resExcecoes.data) resExcecoes.data.forEach(ex => excecoes[ex.data] = { inicio: ex.hora_inicio, fim: ex.hora_fim });
 
-            // LÓGICA RÍGIDA: Só libera se encontrar o registro e ele for TRUE.
-            // Se o mês não existir no banco (resMeses.data é nulo), estaLiberado será false.
-            const estaLiberado = resMeses.data?.liberado === true;
-
-            if (!estaLiberado) {
-                container.innerHTML = `
-                    <div class="col-span-7 flex flex-col items-center py-10 opacity-60">
-                        <i data-lucide="lock" class="w-8 h-8 mb-2 gold-text"></i>
-                        <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-center px-4">
-                            Agenda fechada para este mês.
-                        </p>
-                    </div>`;
+            if (resMeses.data?.liberado !== true) {
+                container.innerHTML = `<div class="col-span-7 flex flex-col items-center py-10 opacity-60"><i data-lucide="lock" class="w-8 h-8 mb-2 gold-text"></i><p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-center">Agenda fechada para este mês.</p></div>`;
             } else { 
                 renderCalendar(mesVisualizado); 
             }
@@ -191,25 +199,17 @@
             const primeiroDia = new Date(dataBase.getFullYear(), dataBase.getMonth(), 1).getDay();
             const ultimoDia = new Date(dataBase.getFullYear(), dataBase.getMonth() + 1, 0).getDate();
             const hoje = new Date(); hoje.setHours(0,0,0,0);
-
             container.innerHTML = '';
             for(let i=0; i<primeiroDia; i++) container.innerHTML += '<div></div>';
-            
             for(let d=1; d<=ultimoDia; d++) {
                 const dataStr = `${dataBase.getFullYear()}-${String(dataBase.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                 const dataLoop = new Date(dataBase.getFullYear(), dataBase.getMonth(), d);
-                
                 const isBlocked = bloqueios.includes(dataStr);
                 const isPassado = dataLoop < hoje;
-                const temExcecao = excecoes[dataStr];
-
                 const box = document.createElement('div');
-                box.className = `day-box ${isPassado || isBlocked ? 'day-busy' : 'day-free'} ${temExcecao && !isBlocked ? 'day-special' : ''}`;
+                box.className = `day-box ${isPassado || isBlocked ? 'day-busy' : 'day-free'} ${excecoes[dataStr] && !isBlocked ? 'day-special' : ''}`;
                 box.innerText = d;
-                
-                if(!isPassado && !isBlocked) { 
-                    box.onclick = () => carregarHorarios(box, dataStr); 
-                }
+                if(!isPassado && !isBlocked) { box.onclick = () => carregarHorarios(box, dataStr); }
                 container.appendChild(box);
             }
         }
@@ -220,32 +220,22 @@
             dataSelecionada = data; horaSelecionada = null;
             document.getElementById('section-horarios').classList.remove('hidden');
             document.getElementById('display-date').innerText = data.split('-').reverse().join('/');
-            
             const { data: ocupados } = await _supabase.from('agendamentos').select('horario').eq('data_atendimento', data).not('status', 'eq', 'Cancelado');
             const ocupadosList = ocupados?.map(o => o.horario.substring(0, 5)) || [];
-            
-            const hI = excecoes[data]?.inicio || configPadrao.inicio;
-            const hF = excecoes[data]?.fim || configPadrao.fim;
-            
-            const slotsDiv = document.getElementById('time-slots'); 
-            slotsDiv.innerHTML = ''; 
-
+            const hI = excecoes[data]?.inicio || configPadrao.inicio, hF = excecoes[data]?.fim || configPadrao.fim;
+            const slotsDiv = document.getElementById('time-slots'); slotsDiv.innerHTML = ''; 
             let [h, m] = hI.split(':').map(Number);
             let totalMin = (h * 60) + m;
             const totalFim = (parseInt(hF.split(':')[0]) * 60) + parseInt(hF.split(':')[1]);
-
             while (totalMin < totalFim) {
                 const hFormat = `${String(Math.floor(totalMin / 60)).padStart(2, '0')}:${String(totalMin % 60).padStart(2, '0')}`;
                 const btn = document.createElement('div');
                 btn.className = `time-slot ${ocupadosList.includes(hFormat) ? 'occupied' : 'hover:gold-text'}`;
                 btn.innerText = hFormat;
-                
-                if (!ocupadosList.includes(hFormat)) {
-                    btn.onclick = () => {
-                        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('time-selected'));
-                        btn.classList.add('time-selected'); horaSelecionada = hFormat;
-                    };
-                }
+                if (!ocupadosList.includes(hFormat)) btn.onclick = () => {
+                    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('time-selected'));
+                    btn.classList.add('time-selected'); horaSelecionada = hFormat;
+                };
                 slotsDiv.appendChild(btn);
                 totalMin += parseInt(configPadrao.intervalo);
             }
@@ -253,14 +243,7 @@
 
         async function carregarServicos() {
             const { data } = await _supabase.from('servicos').select('*').order('nome');
-            if(data) document.getElementById('listaServicos').innerHTML = data.map(s => `
-                <label class="flex justify-between items-center p-3 hover:bg-zinc-50 border-b last:border-0 border-zinc-100 cursor-pointer">
-                    <div class="flex items-center gap-3">
-                        <input type="checkbox" value="${s.nome}" data-price="${s.preco}" onchange="calcTotal()" class="accent-[#D4AF37] w-4 h-4">
-                        <span class="font-bold text-zinc-800 uppercase text-[10px] tracking-tighter">${s.nome}</span>
-                    </div>
-                    <span class="text-zinc-400 font-bold">R$ ${s.preco.toFixed(2).replace('.', ',')}</span>
-                </label>`).join('');
+            if(data) document.getElementById('listaServicos').innerHTML = data.map(s => `<label class="flex justify-between items-center p-3 hover:bg-zinc-50 border-b last:border-0 border-zinc-100 cursor-pointer"><div class="flex items-center gap-3"><input type="checkbox" value="${s.nome}" data-price="${s.preco}" onchange="calcTotal()" class="accent-[#D4AF37] w-4 h-4"><span class="font-bold text-zinc-800 uppercase text-[10px] tracking-tighter">${s.nome}</span></div><span class="text-zinc-400 font-bold">R$ ${s.preco.toFixed(2).replace('.', ',')}</span></label>`).join('');
         }
 
         function calcTotal() {
@@ -271,19 +254,17 @@
         async function finalizarAgendamento() {
             const n = document.getElementById('nome').value.trim(), z = document.getElementById('whatsapp_input').value; 
             const svs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
-            
             if(!n || z.length < 14 || !dataSelecionada || !horaSelecionada || svs.length === 0) return alert("Preencha tudo! 💅");
-            
             const totalStr = document.getElementById('totalDisplay').innerText;
             const { error } = await _supabase.from('agendamentos').insert([{
                 cliente_nome: n.toUpperCase(), telefone: z, data_atendimento: dataSelecionada,
                 horario: horaSelecionada, servico: svs.join(", "), status: "Aguardando",
                 valor: parseFloat(totalStr.replace('R$ ', '').replace(',', '.'))
             }]);
-
             if(!error) {
-                const msg = `Agendamento Rivi Silva 💅\n\nNome: ${n.toUpperCase()}\nData: ${dataSelecionada.split('-').reverse().join('/')}\nHora: ${horaSelecionada}\nServiços: ${svs.join(", ")}\nTotal: ${totalStr}`;
-                window.open(`https://wa.me/5571992447638?text=${encodeURIComponent(msg)}`, '_blank');
+                const msg = `Agendamento Rivi Silva 💅\n\nNome: ${n.toUpperCase()}\nData: ${dataSelecionada.split('-').reverse().join('/')}\nHora: ${horaSelecionada}\nServiços: ${svs.join(", ")}\nTotal: ${totalStr}\n\nsegue o meu comprovante com o sinal para garantir o meu agendamento!`;
+                // Link universal para garantir redirecionamento em qualquer aparelho
+                window.open(`https://api.whatsapp.com/send?phone=5571992447638&text=${encodeURIComponent(msg)}`, '_blank');
                 location.reload();
             } else { alert("Erro ao agendar."); }
         }
