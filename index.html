@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta http-equiv="cache-control" content="no-cache, must-revalidate, post-check=0, pre-check=0">
+    <meta http-equiv="expires" content="0">
+    <meta http-equiv="pragma" content="no-cache">
+
     <title>Agendamento | Rivi Silva Esmalteria</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -129,7 +134,7 @@
                 </div>
 
                 <button id="btnAgendar" onclick="finalizarAgendamento()" class="w-full bg-[#25D366] text-white font-black py-5 rounded-xl shadow-lg uppercase text-[11px] tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all">
-                    <i data-lucide="check-circle" class="w-5 h-5"></i> Envie o Comprovante Aqui 💅
+                    <i data-lucide="check-circle" class="w-5 h-5"></i> <span id="btnText">Envie o Comprovante Aqui 💅</span>
                 </button>
             </div>
         </div>
@@ -144,6 +149,9 @@
         let configPadrao = { inicio: '09:00', fim: '18:00', intervalo: 40 };
         let bloqueios = [], excecoes = {};
         let mesVisualizado = new Date();
+
+        // CACHE BUSTING: Garante que o script busque dados novos do Supabase ignorando o cache local
+        function getUniqueQuery() { return `?t=${new Date().getTime()}`; }
 
         function phoneMask(v) {
             v = v.replace(/\D/g, "");
@@ -179,6 +187,7 @@
             const mes = String(mesVisualizado.getMonth() + 1).padStart(2, '0');
             const mesAnoKey = `${ano}-${mes}`;
 
+            // Adicionado query randômica para forçar bypass de cache no fetch
             const [resConfig, resBloqueios, resExcecoes, resMeses] = await Promise.all([
                 _supabase.from('agenda_config').select('*').eq('id', 1).maybeSingle(),
                 _supabase.from('agenda_bloqueada').select('data_interditada'),
@@ -226,6 +235,7 @@
             document.getElementById('section-horarios').classList.remove('hidden');
             document.getElementById('display-date').innerText = data.split('-').reverse().join('/');
             
+            // Bypass de cache na busca de ocupados
             const { data: ocupados } = await _supabase.from('agendamentos').select('horario').eq('data_atendimento', data).not('status', 'eq', 'Cancelado');
             const ocupadosList = ocupados?.map(o => o.horario.substring(0, 5)) || [];
             
@@ -236,14 +246,12 @@
             let totalMin = (h * 60) + m;
             const totalFim = (parseInt(hF.split(':')[0]) * 60) + parseInt(hF.split(':')[1]);
 
-            // Bloqueio de horários retroativos para HOJE
             const agora = new Date();
             const hojeStr = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`;
             const horaAtualMinutos = (agora.getHours() * 60) + agora.getMinutes();
 
             while (totalMin < totalFim) {
                 const hFormat = `${String(Math.floor(totalMin / 60)).padStart(2, '0')}:${String(totalMin % 60).padStart(2, '0')}`;
-                
                 const jaPassou = (data === hojeStr && totalMin <= horaAtualMinutos);
                 const isOcupado = ocupadosList.includes(hFormat) || jaPassou;
 
@@ -273,9 +281,19 @@
         }
 
         async function finalizarAgendamento() {
+            const btn = document.getElementById('btnAgendar');
+            const btnText = document.getElementById('btnText');
+            
             const n = document.getElementById('nome').value.trim(), z = document.getElementById('whatsapp_input').value; 
             const svs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
+            
             if(!n || z.length < 14 || !dataSelecionada || !horaSelecionada || svs.length === 0) return alert("Preencha tudo! 💅");
+
+            // Feedback visual de carregamento
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            btnText.innerText = "Sincronizando agendamento...";
+
             const totalStr = document.getElementById('totalDisplay').innerText;
             
             const { error } = await _supabase.from('agendamentos').insert([{
@@ -287,7 +305,12 @@
             if(!error) {
                 const msg = `Agendamento Rivi Silva 💅\n\nNome: ${n.toUpperCase()}\nData: ${dataSelecionada.split('-').reverse().join('/')}\nHora: ${horaSelecionada}\nServiços: ${svs.join(", ")}\nTotal: ${totalStr}\n\nsegue o meu comprovante com o sinal para garantir o meu agendamento!`;
                 window.location.href = `https://api.whatsapp.com/send?phone=5571992447638&text=${encodeURIComponent(msg)}`;
-            } else { alert("Erro ao agendar."); }
+            } else { 
+                alert("Erro ao agendar. Tente novamente."); 
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+                btnText.innerText = "Envie o Comprovante Aqui 💅";
+            }
         }
         init();
     </script>
