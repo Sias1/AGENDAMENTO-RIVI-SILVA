@@ -163,22 +163,52 @@
             navigator.clipboard.writeText(pixVal).then(() => { alert("Chave PIX copiada! 💅"); });
         }
 
-        // FUNÇÃO PARA CHECAR SE O HORÁRIO AINDA É VÁLIDO (TRAVA DE SEGURANÇA)
-        function validarHorarioNoMomento(dataS, horaS) {
+        /** * TRAVA DE SEGURANÇA MÁXIMA: 
+         * Força a busca das regras direto do banco no momento do clique, ignorando o que está em cache.
+         */
+        async function validarHorarioNoMomento(dataS, horaS) {
             const agora = new Date();
             const hojeStr = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`;
             
+            // 1. Relógio: Bloqueia se o tempo já passou (para hoje)
             if (dataS === hojeStr) {
                 const [h, m] = horaS.split(':').map(Number);
                 const minutosSelecionado = (h * 60) + m;
                 const minutosAgora = (agora.getHours() * 60) + agora.getMinutes();
-                
                 if (minutosSelecionado <= minutosAgora) {
-                    alert("⚠️ Esse horário acabou de expirar! A página será atualizada para mostrar os horários disponíveis.");
+                    alert("⚠️ Esse horário expirou! Atualizando horários...");
                     window.location.reload();
                     return false;
                 }
             }
+
+            // 2. Banco: Busca as configurações REAIS de agora
+            const { data: configDB } = await _supabase.from('agenda_config').select('*').eq('id', 1).single();
+            const { data: exDB } = await _supabase.from('agenda_excecoes').select('*').eq('data', dataS).maybeSingle();
+
+            const hI = exDB?.hora_inicio || configDB.hora_inicio;
+            const hF = exDB?.hora_fim || configDB.hora_fim;
+            const intervalo = configDB.intervalo_minutos;
+
+            // Reconstrói a grade permitida com base nos novos dados
+            let horariosReaisPermitidos = [];
+            let [h, m] = hI.split(':').map(Number);
+            let totalMin = (h * 60) + m;
+            const [hFim, mFim] = hF.split(':').map(Number);
+            const totalFim = (hFim * 60) + mFim;
+
+            while (totalMin < totalFim) {
+                horariosReaisPermitidos.push(`${String(Math.floor(totalMin / 60)).padStart(2, '0')}:${String(totalMin % 60).padStart(2, '0')}`);
+                totalMin += parseInt(intervalo);
+            }
+
+            // Validação final: o horário que ela clicou ainda existe na nova regra?
+            if (!horariosReaisPermitidos.includes(horaS)) {
+                alert("⚠️ Os horários foram atualizados. Por favor, escolha novamente na lista atualizada.");
+                window.location.reload();
+                return false;
+            }
+
             return true;
         }
 
@@ -258,7 +288,8 @@
             
             let [h, m] = hI.split(':').map(Number);
             let totalMin = (h * 60) + m;
-            const totalFim = (parseInt(hF.split(':')[0]) * 60) + parseInt(hF.split(':')[1]);
+            const [hFimLimit, mFimLimit] = hF.split(':').map(Number);
+            const totalFim = (hFimLimit * 60) + mFimLimit;
 
             const agora = new Date();
             const hojeStr = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`;
@@ -273,12 +304,13 @@
                 btn.className = `time-slot ${isOcupado ? 'occupied' : 'hover:gold-text'}`;
                 btn.innerText = hFormat;
                 
-                if (!isOcupado) btn.onclick = () => {
-                    // TRAVA AO CLICAR: Verifica se o horário não passou enquanto a página estava aberta
-                    if(!validarHorarioNoMomento(dataSelecionada, hFormat)) return;
+                if (!isOcupado) btn.onclick = async () => {
+                    const valido = await validarHorarioNoMomento(dataSelecionada, hFormat);
+                    if(!valido) return;
 
                     document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('time-selected'));
-                    btn.classList.add('time-selected'); horaSelecionada = hFormat;
+                    btn.classList.add('time-selected'); 
+                    horaSelecionada = hFormat;
                 };
                 
                 slotsDiv.appendChild(btn);
@@ -306,10 +338,17 @@
             
             if(!n || z.length < 14 || !dataSelecionada || !horaSelecionada || svs.length === 0) return alert("Preencha tudo! 💅");
 
-            // SEGUNDA TRAVA: Verifica no momento do envio do formulário
-            if(!validarHorarioNoMomento(dataSelecionada, horaSelecionada)) return;
-
             btn.disabled = true;
+            btnText.innerText = "Verificando disponibilidade...";
+            
+            // Re-checa se o horário ainda é válido antes de salvar no banco
+            const validoFinal = await validarHorarioNoMomento(dataSelecionada, horaSelecionada);
+            if(!validoFinal) {
+                btn.disabled = false;
+                btnText.innerText = "Envie o Comprovante Aqui 💅";
+                return;
+            }
+
             btn.classList.add('opacity-50');
             btnText.innerText = "Sincronizando agendamento...";
 
